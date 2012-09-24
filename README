@@ -26,6 +26,9 @@ config/database/db_data.sql
 
 3. Everything should work. The following parts are just extra information.
 
+4. When you're done, please contact us to tell us what you plan to do with it. We'd love to hear from you.
+Also, if you ever plan on making it public, you must remove every mention of the term "Mod Share" and all of the logos.
+
 ----- MAKE YOURSELF AN ADMIN -----
 After your creating your account, run the following query on the database:
 
