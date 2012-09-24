@@ -20,7 +20,9 @@ $db_info = array( //database info
 
 So, set all of the necessary options to connect to your database.
 
-2. Run the provided database config file to set up the database (should be database.sql or something like that)
+2. Import all of the following database files:
+config/database/db_structure.sql
+config/database/db_data.sql
 
 3. Everything should work. The following parts are just extra information.
 
