@@ -1,0 +1,173 @@
+<?php
+$content_type = 'text/css';
+
+$style = $ms_user['style_col'];
+$r = hexdec($style{0});
+$g = hexdec($style{1});
+$b = hexdec($style{2});
+$light = dechex(min(($r + 1) + 5, 14)) . dechex(min(($g + 1) + 5, 14)) . dechex(min(($b + 1) + 5, 14));
+$lighter = dechex(min(($r + 1) + 8, 14)) . dechex(min(($g + 1) + 8, 14)) . dechex(min(($b + 1) + 8, 14));
+$dark = dechex(max(($r + 1) / 3, 1)) . dechex(max(($g + 1) / 3, 1)) . dechex(max(($b + 1) / 3, 1));
+?>
+@charset: "utf-8";
+/* Dynamic CSS document */
+
+
+/* *************BODY, CONTAINER, CONTENT************** */
+body  {
+	font: 100% Tahoma, Geneva, sans-serif;
+	background: #555;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	color: #000000;
+}
+#container {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	width: 90%;
+	background: #FFFFFF;
+	margin: 0 auto;
+	border: 1px solid #000000;
+	text-align: left;
+}
+#mainContent { 
+	margin: 0 26% 0 10px;
+	background-color:#FFF;
+}
+a {
+	color: #<?php echo $light; ?>;
+	text-decoration: none;
+}
+a:hover {
+	color: #<?php echo $lighter; ?>;
+	text-decoration: none;
+}
+img {
+	border: none 0px #FFF;
+}
+
+
+/* *********************HEADER********************* */
+#hheader {
+	background: #<?php echo $style; ?>;
+	padding: 0 10px;
+	box-shadow: inset 0 0 36px #<?php if ($ms_config['status'] == 'warning') echo 'F00'; else echo 'FFF'; ?>;
+	color: #FFF;
+	font-weight: bold;
+	height: 50px;
+	overflow: hidden;
+}
+#hheader h1 {
+	margin: 0;
+	padding: 10px 0;
+	color: #FFF;
+	font-size: 22px;
+	-webkit-transition: linear color 0.4s;
+}
+#hheader td {
+	overflow: hidden;
+}
+#hheader a {
+	text-decoration: none;
+	color: #FFF;
+}
+#hheader a:hover {
+	color: #AAA;
+	-webkit-transition: linear color 0.4s;
+}
+#homelink a:hover {
+	color: #AAA;
+}
+#homelinktd {
+	width: 170px;
+}
+.ltd {
+	width:100px;
+}
+.announcement {
+	border-radius: 3px;
+	background-color:#3AC;
+	margin-left: 5px;
+	margin-top: 5px;
+	padding: 3px;
+	width: 75%;
+}
+
+
+/* *********************SIDEBAR********************* */
+#sidebar {
+	box-shadow: inset 2px -2px 8px 2px #<?php if ($ms_config['status'] == 'warning') echo 'F00'; else echo 'CCC'; ?>;
+	float: right;
+	width: 24%; 
+	background: #<?php echo $style; ?>;
+	padding-top: 15px;
+	min-width:200px;
+}
+#sidebar h3, #sidebar h4, #sidebar p, #sidebar table {
+	margin-left: 10px;
+	margin-right: 10px;
+	color:#FFF;
+}
+
+
+/* *********************FOOTER********************* */
+#footer {
+	box-shadow: 0 -3px 2px 0px #AAA;
+	padding: 0 10px;
+	background: #<?php if ($ms_config['status'] == 'warning') echo 'C00'; else echo $dark; ?>;
+	color: #<?php echo $lighter; ?>;
+} 
+#footer p {
+	margin: 0;
+	padding: 10px 0;
+}
+
+.clearfloat { /* place after sidebar to inflate mainContents. this is already done in footer.php */
+	clear:both;
+    height:0;
+    font-size: 1px;
+    line-height: 0px;
+}
+
+/* *********************ITEMS********************* */
+input[type=button], input[type=submit] {
+	background-color: #<?php echo $style; ?>;
+	border: none;
+	border-radius: 8px;
+	color: #FFF;
+	font-weight: bold;
+	min-height: 30px;
+	padding-left: 10px;
+	padding-right: 10px;
+	box-shadow: inset 0 0 10px #<?php if ($ms_config['status'] == 'warning') echo 'F00'; else echo 'FFF'; ?>;
+}
+
+input[type=button]:hover, input[type=submit]:hover {
+	background-color: #<?php echo $dark; ?>;
+}
+
+input[type=button]:active, input[type=submit]:active {
+	background-color: #<?php echo $light; ?>;
+	color: #BBB;
+	box-shadow: inset 0 3px 10px #<?php if ($ms_config['status'] == 'warning') echo 'F00'; else echo 'FFF'; ?>;
+}
+
+textarea {
+	font-family: Arial;
+}
+
+#friendslist {
+	list-style: none;
+	margin-left: -40px;
+}
+
+.editable {
+	background-color:#FFF;
+	-webkit-transition: background-color .5s linear;
+}
+
+.editable:hover {
+	background-color:#FF4;
+	-webkit-transition: background-color .5s linear;
+}

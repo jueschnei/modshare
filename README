@@ -1,0 +1,30 @@
+Welcome to Mod Share IV.
+This code is copyrighted to LS97 and jvvg.
+
+System requirements
+-Apache
+	-Support for the Rewrite Engine
+	-Support for PHP values in .htaccess (not required, but helpful for session stuff)
+-PHP 5.2 or later
+-MySQL Improved 5.1 or later
+
+To install, do the following:
+1. Go into /config/bootstrap.php and you should see something like this:
+
+$db_info = array( //database info
+	'host'	=> 'hostname',
+	'user' 	=> 'username',
+	'pass' 	=> 'password',
+	'name'	=> 'dbname'
+);
+
+So, set all of the necessary options to connect to your database.
+
+2. Run the provided database config file to set up the database (should be database.sql or something like that)
+
+3. Everything should work. The following parts are just extra information.
+
+----- MAKE YOURSELF AN ADMIN -----
+After your creating your account, run the following query on the database:
+
+UPDATE users SET permission=3 WHERE username='your username'

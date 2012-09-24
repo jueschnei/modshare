@@ -1,0 +1,27 @@
+[08-Sep-2012 12:33:18] PHP Fatal error:  Cannot redeclare error() (previously declared in /home/u462179355/public_html/forums/include/functions.php:1448) in /home/u462179355/public_html/includes/global_functions.php on line 17
+[08-Sep-2012 12:33:20] PHP Fatal error:  Cannot redeclare error() (previously declared in /home/u462179355/public_html/forums/include/functions.php:1448) in /home/u462179355/public_html/includes/global_functions.php on line 17
+[08-Sep-2012 12:33:56] PHP Fatal error:  Cannot redeclare error() (previously declared in /home/u462179355/public_html/forums/include/functions.php:1448) in /home/u462179355/public_html/includes/global_functions.php on line 17
+[08-Sep-2012 12:33:57] PHP Fatal error:  Cannot redeclare error() (previously declared in /home/u462179355/public_html/forums/include/functions.php:1448) in /home/u462179355/public_html/includes/global_functions.php on line 17
+[08-Sep-2012 12:33:57] PHP Fatal error:  Cannot redeclare error() (previously declared in /home/u462179355/public_html/forums/include/functions.php:1448) in /home/u462179355/public_html/includes/global_functions.php on line 17
+[08-Sep-2012 12:34:35] PHP Fatal error:  Call to undefined function  check_user() in /home/u462179355/public_html/forums/include/common.php on line 202
+[08-Sep-2012 12:35:35] PHP Fatal error:  require() [<a href='function.require'>function.require</a>]: Failed opening required '/home/u462179355/public_html/forums/lang//index.php' (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/u462179355/public_html/forums/index.php on line 18
+[08-Sep-2012 12:39:18] PHP Fatal error:  Call to a member function query() on a non-object in /home/u462179355/public_html/includes/global_functions.php on line 44
+[08-Sep-2012 12:39:19] PHP Fatal error:  Call to a member function query() on a non-object in /home/u462179355/public_html/includes/global_functions.php on line 44
+[08-Sep-2012 12:39:52] PHP Warning:  Unexpected character in input:  ''' (ASCII=39) state=1 in /home/u462179355/public_html/forums/include/common.php on line 10
+[08-Sep-2012 12:39:52] PHP Parse error:  syntax error, unexpected T_STRING in /home/u462179355/public_html/forums/include/common.php on line 10
+[12-Sep-2012 17:37:58] PHP Warning:  session_start() [<a href='function.session-start'>function.session-start</a>]: open(SRV_ROOT/sessions/sess_4f292403bf7fe221a0d535783069b9b2, O_RDWR) failed: No such file or directory (2) in /home/u462179355/public_html/forums/include/common.php on line 205
+[12-Sep-2012 17:37:59] PHP Warning:  session_start() [<a href='function.session-start'>function.session-start</a>]: open(SRV_ROOT/sessions/sess_4f292403bf7fe221a0d535783069b9b2, O_RDWR) failed: No such file or directory (2) in /home/u462179355/public_html/forums/include/common.php on line 205
+[12-Sep-2012 17:38:09] PHP Fatal error:  require() [<a href='function.require'>function.require</a>]: Failed opening required '/home/u462179355/public_html/forums/lang//index.php' (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/u462179355/public_html/forums/index.php on line 18
+[12-Sep-2012 17:49:37] PHP Parse error:  syntax error, unexpected $end in /home/u462179355/public_html/forums/include/functions.php on line 981
+[15-Sep-2012 16:12:41] PHP Fatal error:  require() [<a href='function.require'>function.require</a>]: Failed opening required '/home/u462179355/public_html/forums/lang//prof_reg.php' (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/u462179355/public_html/forums/profile.php on line 32
+[18-Sep-2012 21:33:02] PHP Warning:  Wrong parameter count for preg_replace() in /home/u462179355/public_html/forums/include/parser.php on line 873
+[18-Sep-2012 21:33:03] PHP Warning:  Wrong parameter count for preg_replace() in /home/u462179355/public_html/forums/include/parser.php on line 873
+[18-Sep-2012 21:33:08] PHP Parse error:  syntax error, unexpected $end in /home/u462179355/public_html/forums/include/parser.php on line 93
+[18-Sep-2012 21:33:16] PHP Parse error:  syntax error, unexpected $end in /home/u462179355/public_html/forums/include/parser.php on line 644
+[18-Sep-2012 21:37:01] PHP Fatal error:  Call to undefined function  parse_message() in /home/u462179355/public_html/forums/viewtopic.php on line 340
+[18-Sep-2012 21:37:17] PHP Fatal error:  Call to undefined function  parse_message() in /home/u462179355/public_html/forums/viewtopic.php on line 340
+[18-Sep-2012 21:38:32] PHP Fatal error:  Call to undefined function  parse_message() in /home/u462179355/public_html/forums/viewtopic.php on line 340
+[18-Sep-2012 21:38:42] PHP Fatal error:  Call to undefined function  parse_message() in /home/u462179355/public_html/forums/viewtopic.php on line 340
+[20-Sep-2012 20:07:51] PHP Notice:  Undefined index:  username in /home/u462179355/public_html/forums/config.php on line 8
+[20-Sep-2012 20:07:52] PHP Notice:  Undefined index:  username in /home/u462179355/public_html/forums/config.php on line 8
+[20-Sep-2012 20:07:53] PHP Notice:  Undefined index:  username in /home/u462179355/public_html/forums/config.php on line 8
