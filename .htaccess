@@ -1,0 +1,15 @@
+RewriteEngine On
+RewriteBase /
+
+ErrorDocument 404 /errorpages/404.php
+
+Options -indexes
+
+RewriteRule ^img/(.*)$ img/$1 [L]
+RewriteRule ^L/(.*)$ img/L/$1 [L]
+RewriteRule ^forums(.*)$ forums$1 [L]
+RewriteRule ^favicon.ico/?$ img/favicon.ico [L]
+RewriteRule ^data/(.*)$ data/$1 [L]
+RewriteRule ^(.*)$ dispatcher.php
+
+php_value post_max_size 10M
