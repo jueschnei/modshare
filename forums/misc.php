@@ -51,7 +51,7 @@ else if ($action == 'markread')
 	if ($pun_user['is_guest'])
 		message($lang_common['No permission'], false, '403 Forbidden');
 
-	$db->query('UPDATE '.$db->prefix.'users SET last_visit='.$pun_user['logged'].' WHERE id='.$pun_user['id']) or error('Unable to update user last visit data', __FILE__, __LINE__, $db->error());
+	$db->query('UPDATE '.$db->prefix.'users SET last_visit='.$pun_user['logged'].', tracked_topics=null WHERE id='.$pun_user['id']) or error('Unable to update user last visit data', __FILE__, __LINE__, $db->error());
 
 	// Reset tracked topics
 	set_tracked_topics(null);
@@ -235,6 +235,26 @@ else if (isset($_GET['report']))
 
 		list($subject, $forum_id) = $db->fetch_row($result);
 
+		if ($ms_user['group_id'] != 5) { //add code for a number of reports for a post
+			$result = $db->query('SELECT 1 FROM ' . $db->prefix . 'reports
+			WHERE reported_by=' . $pun_user['id'] . '
+			AND post_id=' . $post_id) or error('Failed to check existing reports', __FILE__, __LINE__, $db->error());
+			if (!$db->num_rows($result)) {
+				$db->query('UPDATE ' . $db->prefix . 'posts
+				SET num_reports=num_reports+1
+				WHERE id=' . $post_id) or error('Failed to update number of reports', __FILE__, __LINE__, $db->error());
+				$result2 = $db->query('SELECT num_reports,poster,poster_ip FROM ' . $db->prefix . 'posts
+				WHERE id=' . $post_id) or error('Failed to get number of reports', __FILE__, __LINE__, $db->error());
+				list($num_reports, $poster, $poster_ip) = $db->fetch_row($result2);
+				if ($num_reports >= TOO_MANY_REPORTS) {
+					$db->query('INSERT INTO ' . $db->prefix . 'bans(username,ip,message,expire,ban_creator)
+					VALUES(\'' . $db->escape($poster) . '\',\'' . $poster_ip . '\',\'You have been auto-banned because one of your posts has been reported several times. The Mod Share Team will check it out and unban you if it was OK.\',' . ($now + 60 * 60 * 24) . ',0)') or error('Failed to autoban user', __FILE__, __LINE__, $db->error());
+					$reason .= "\n" . 'Warning: user has been auto-banned and post has been hidden';
+					unlink(FORUM_CACHE_DIR . 'cache_bans.php');
+				}
+			}
+		}
+		
 		// Should we use the internal report handling?
 		if ($pun_config['o_report_method'] == '0' || $pun_config['o_report_method'] == '2')
 			$db->query('INSERT INTO '.$db->prefix.'reports (post_id, topic_id, forum_id, reported_by, created, message) VALUES('.$post_id.', '.$topic_id.', '.$forum_id.', '.$pun_user['id'].', '.time().', \''.$db->escape($reason).'\')' ) or error('Unable to create report', __FILE__, __LINE__, $db->error());

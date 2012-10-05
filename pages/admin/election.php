@@ -15,6 +15,7 @@ if (isset($_POST['form_sent'])) {
 		SET text=\'' . $db->escape($val) . '\'
 		WHERE id=' . intval($key)) or error('Failed to update election options', __FILE__, __LINE__, $db->error());
 	}
+	set_config('election_mandatory', $_POST['mandatory']);
 }
 ?>
 <h2>Election setup</h2>
@@ -23,28 +24,39 @@ if (isset($_POST['form_sent'])) {
 	<p><input type="submit" name="add_new" value="Add new option" /> &bull; <input type="submit" name="clear" value="Clear options and votes" /></p>
 </form>
 <form action="/admin/election_setup" method="post" enctype="multipart/form-data">
-	<h4>Setup</h4>
-	<table border="0">
-		<tr>
-			<td>Question</td>
-			<td><input type="text" name="question" value="<?php echo clearHTML($ms_config['election_question']); ?>" size="50" /></td>
-		</tr>
-	</table>
-	<h4>Poll options</h4>
-	<table border="0">
-		<?php
-		$result = $db->query('SELECT id,text FROM election_options
-		ORDER BY id ASC') or error('Failed to get current election options', __FILE__, __LINE__, $db->error());
-		while ($cur_option = $db->fetch_assoc($result)) {
-			echo '
-		<tr>
-			<td><input type="text" name="opts[' . $cur_option['id'] . ']" value="' . clearHTML($cur_option['text']) . '" /></td>
-		</tr>
-		';
-		}
-		?>
-	</table>
-	<input type="submit" name="form_sent" value="Save" />
+	<?php
+	if ($ms_config['election']) {
+		echo '<p>Editing is disabled while voting is live.<br /><a onclick="document.getElementById(\'polledit\').style.display = \'block\';" style="cursor:pointer">Edit anyway</a></p>';
+	}
+	?>
+	<div id="polledit"<?php if ($ms_config['election']) echo ' style="display:none"'; ?>>
+		<h4>Setup</h4>
+		<table border="0">
+			<tr>
+				<td>Question</td>
+				<td><input type="text" name="question" value="<?php echo clearHTML($ms_config['election_question']); ?>" size="50" /></td>
+			</tr>
+			<tr>
+				<td>Mandatory voting</td>
+				<td><input type="radio" name="mandatory" value="yes"<?php if ($ms_config['election_mandatory'] == 'yes') echo ' checked="checked"'; ?> />Yes &nbsp; <input type="radio" name="mandatory" value="no"<?php if ($ms_config['election_mandatory'] == 'no') echo ' checked="checked"'; ?> />No</td>
+			</tr>
+		</table>
+		<h4>Poll options</h4>
+		<table border="0">
+			<?php
+			$result = $db->query('SELECT id,text FROM election_options
+			ORDER BY id ASC') or error('Failed to get current election options', __FILE__, __LINE__, $db->error());
+			while ($cur_option = $db->fetch_assoc($result)) {
+				echo '
+			<tr>
+				<td><input type="text" name="opts[' . $cur_option['id'] . ']" value="' . clearHTML($cur_option['text']) . '" /></td>
+			</tr>
+			';
+			}
+			?>
+		</table>
+		<p><input type="submit" name="form_sent" value="Save" /></p>
+	</div>
 </form>
 <?php
 if ($ms_config['election']) { ?>
@@ -54,6 +66,7 @@ if ($ms_config['election']) { ?>
 	LEFT JOIN election_options AS eo
 	ON eo.id=ev.choice') or error('Failed to get election results', __FILE__, __LINE__, $db->error());
 	$results = array();
+	$total = $db->num_rows($result);
 	while ($cur_vote = $db->fetch_assoc($result)) {
 		if (isset($results[$cur_vote['text']])) {
 			$results[$cur_vote['text']]++;
@@ -61,7 +74,14 @@ if ($ms_config['election']) { ?>
 			$results[$cur_vote['text']] = 1;
 		}
 	}
+	?>
+	<?php
 	foreach ($results as $key => $val) {
-		echo '<p>' . clearHTML($key) . ': ' . $val . ' vote(s)</p>';
+		echo '
+		<p style="border: 1px solid #000; width: 100%;">
+			<span style="width:' . (($val / $total) * 100) . '%; background-color: #39F; display:block; padding-left: 1px; padding-top: 1px; padding-bottom: 1px">' . $key . ': ' . $val . ' vote(s)</span>
+		</p>';
 	}
+	?>
+	<?php
 }

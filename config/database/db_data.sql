@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Sep 24, 2012 at 01:01 PM
+-- Generation Time: Oct 05, 2012 at 05:42 PM
 -- Server version: 5.1.63
 -- PHP Version: 5.2.6
 
@@ -25,15 +25,16 @@ SET time_zone = "+00:00";
 --
 
 INSERT INTO `config` (`c_name`, `c_value`) VALUES
-('adminnews', ''),
+('adminnews', '<p><span style="font-weight: bold;" id="news1349454758">j:</span> I am ending the election tonight.</p>'),
 ('status', 'normal'),
-('downloadfiles', ''),
-('maintenance_msg', 'This site is down for maintenance. Please come back later.'),
-('announcement', 'Moderator elections will start at the end of this week. <a href="http://scratch.mit.edu/forums/viewtopic.php?id=106243&p=1">Nominate yourself</a> if you want to run.'),
-('election_question', 'Who should be moderator, in your opinion?'),
-('lasthelp', '1348364244'),
+('downloadfiles', 'dispatcher.php\nconfig\npages\nincludes\nforums\n'),
+('maintenance_msg', 'This site is down for maintenance. Please come back in a few minutes.'),
+('announcement', ''),
+('election_question', 'Who do you think should be moderator?'),
+('lasthelp', '1349470935'),
 ('log', 'on'),
-('election', '0');
+('election', '1'),
+('election_mandatory', 'yes');
 
 --
 -- Dumping data for table `flux_config`
@@ -49,7 +50,7 @@ INSERT INTO `flux_config` (`conf_name`, `conf_value`) VALUES
 ('o_default_timezone', '-5'),
 ('o_time_format', 'H:i:s'),
 ('o_date_format', 'Y-m-d'),
-('o_timeout_visit', '1800'),
+('o_timeout_visit', '259200'),
 ('o_timeout_online', '300'),
 ('o_redirect_delay', '0'),
 ('o_show_version', '0'),
@@ -78,7 +79,7 @@ INSERT INTO `flux_config` (`conf_name`, `conf_value`) VALUES
 ('o_additional_navlinks', ''),
 ('o_report_method', '0'),
 ('o_regs_report', '0'),
-('o_default_email_setting', '1'),
+('o_default_email_setting', '2'),
 ('o_mailing_list', 'jacob@futuresight.org'),
 ('o_avatars', '0'),
 ('o_avatars_dir', 'img/avatars'),
@@ -97,8 +98,8 @@ INSERT INTO `flux_config` (`conf_name`, `conf_value`) VALUES
 ('o_smtp_ssl', '0'),
 ('o_regs_allow', '1'),
 ('o_regs_verify', '0'),
-('o_announcement', '0'),
-('o_announcement_message', 'Enter your announcement here.'),
+('o_announcement', '1'),
+('o_announcement_message', '<b style="font-weight: bold; font-size: 18px">Moderator elections have begun! <a href="/vote">Vote here</a>!</b>'),
 ('o_rules', '0'),
 ('o_rules_message', 'Enter your rules here'),
 ('o_maintenance', '0'),
@@ -124,6 +125,25 @@ INSERT INTO `flux_config` (`conf_name`, `conf_value`) VALUES
 ('o_poll_time', '0'),
 ('o_poll_term', '0'),
 ('o_poll_guest', '0');
+
+--
+-- Dumping data for table `flux_groups`
+--
+
+INSERT INTO `flux_groups` (`g_id`, `g_title`, `g_user_title`, `g_moderator`, `g_global_moderator`, `g_mod_edit_users`, `g_mod_rename_users`, `g_mod_change_passwords`, `g_mod_ban_users`, `g_read_board`, `g_view_users`, `g_post_replies`, `g_post_topics`, `g_edit_posts`, `g_delete_posts`, `g_delete_topics`, `g_set_title`, `g_search`, `g_search_users`, `g_send_email`, `g_post_flood`, `g_search_flood`, `g_email_flood`, `g_report_flood`, `g_bin_posts`, `g_bin_topics`, `g_empty_bin`, `g_bin_restore`, `g_bin_delete`) VALUES
+(1, 'Mod Share Team', 'Mod Share Team', 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1),
+(2, 'Community Moderators', 'Community Moderator', 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0),
+(3, 'Guests', 'Guest', 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 45, 10, 0, 0, 1, 1, 1, 1, 1),
+(4, 'Mod Share-ers', 'Mod Share-er', 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 60, 0, 60, 0, 1, 1, 1, 1, 1),
+(5, 'New Mod Share-ers', 'New Mod Share-er', 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 120, 10, 60, 60, 1, 1, 1, 1, 1),
+(6, 'Restricted Mod Share-ers', 'Mod Share-er', 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 180, 20, 60, 90, 1, 1, 1, 1, 1);
+
+--
+-- Dumping data for table `flux_users`
+--
+
+INSERT INTO `flux_users` (`id`, `group_id`, `username`, `password`, `email`, `title`, `realname`, `url`, `jabber`, `icq`, `msn`, `aim`, `yahoo`, `location`, `signature`, `disp_topics`, `disp_posts`, `email_setting`, `notify_with_post`, `auto_notify`, `show_smilies`, `show_img`, `show_img_sig`, `show_avatars`, `show_sig`, `timezone`, `dst`, `time_format`, `date_format`, `language`, `style`, `num_posts`, `last_post`, `last_search`, `last_email_sent`, `last_report_sent`, `registered`, `registration_ip`, `last_visit`, `admin_note`, `activate_string`, `activate_key`, `tracked_topics`) VALUES
+(1, 3, 'Guest', 'Guest', 'Guest', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 'English', 'Mod Share Default', 0, NULL, NULL, NULL, NULL, 0, '0.0.0.0', 1346972744, NULL, NULL, NULL, NULL),(0, 1, '*Admin Bot*', 'admin-bot', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 'English', 'Oxygen', 0, NULL, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL, NULL, NULL);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -27,6 +27,10 @@ class databasetool {
 		return mysqli_fetch_assoc($result);
 	}
 	
+	function fetch_row($result) { # fetch as an indexed array
+		return mysqli_fetch_row($result);
+	}
+	
 	function escape($str) { # escape string
 		return mysqli_real_escape_string($this->link, $str);
 	}
@@ -41,6 +45,10 @@ class databasetool {
 	
 	function insert_id() { #return the last ID inserted
 		return mysqli_insert_id($this->link);
+	}
+	
+	function fetch_fields($result) { #returns an array with the fields in a result
+		return mysqli_fetch_fields($result);
 	}
 	
 	function close() { # close the connection

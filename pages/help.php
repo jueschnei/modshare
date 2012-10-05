@@ -17,7 +17,13 @@ if (isset($_POST['form_sent'])) {
 	return;
 }
 ?>
-<h3>Contact us</h3>
+<h2>Contact us</h2>
+<p>Note: due to bugs with this, we recommend contacting us directly.</p>
+<?php
+if ($ms_user['valid'] || $ms_user['banned']) { ?>
+<p>Please email is at "helpdesk [at] futuresight [dot] org"</p>
+<?php return;
+} ?>
 <form action="/help" method="post" enctype="multipart/form-data">
 	<table border="0">
 		<tr>

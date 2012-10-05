@@ -16,7 +16,7 @@ if (isset($_POST['form_sent'])) {
 $user = $dirs[2];
 if (isset($_POST['permission']) && $ms_user['is_admin']) {
 	$db->query('UPDATE users
-	SET permission=' . intval($_POST['permission']) . '
+	SET permission=' . intval($_POST['permission']) . ',imgsrv=' . intval($_POST['imgsrv']) . '
 	WHERE LOWER(username) = LOWER(\'' . $db->escape($user) . '\')') or error('Failed to update user info', __FILE__, __LINE__, $db->error());
 	header('Refresh: 0'); die;
 }
@@ -27,7 +27,7 @@ if ($user == $ms_user['username']) {
 	$page_title = clearHTML($user) . ' - Mod Share';
 	$me = false;
 }
-$result = $db->query('SELECT id,permission,avatar,style_col,style_logo,status,registration_ip,registered FROM users
+$result = $db->query('SELECT id,permission,avatar,style_col,style_logo,status,registration_ip,registered,imgsrv FROM users
 WHERE username=\'' . $db->escape($user) . '\'') or error('Failed to get user', __FILE__, __LINE__, $db->error());
 if (!$db->num_rows($result)) {
 	ob_end_clean();
@@ -100,6 +100,11 @@ if ($me) {
 		echo '</ul>';
 	}
 }
+if (isset($_GET['assumeid']) && $ms_user['is_admin']) {
+	$_SESSION['uid'] = $user_info['id'];
+	$_SESSION['origid'] = $ms_user['id'];
+	echo '<meta http-equiv="Refresh" content="0; url=/" />';
+}
 ?>
 <table border="0">
 	<tr>
@@ -137,7 +142,7 @@ if ($me) {
 			<?php
 			$result = $db->query('SELECT id,title,thumbnail FROM projects
 			WHERE uploaded_by=' . $user_info['id'] . '
-			AND status<>\'deleted\'
+			AND status=\'normal\'
 			ORDER BY time DESC') or error('Failed to get projects', __FILE__, __LINE__, $db->error());
 			if ($db->num_rows($result)) {
 				echo '<table border="0">
@@ -249,7 +254,12 @@ if ($me) {
 			<?php if ($ms_user['is_mod']) { ?>
 			<h2>User administration</h2>
 			<p>Registered on <?php echo format_date($user_info['registered']); ?> from IP <a href="/admin/search_ip/<?php echo $user_info['registration_ip']; ?>"><?php echo $user_info['registration_ip']; ?></a></p>
-			<p><a href="/admin/ban_user/<?php echo $user_info['id']; ?>">Ban user</a> &bull; <a href="/admin/notify/<?php echo $user_info['id']; ?>">Send notification</a> &bull; <a href="/admin/history/<?php echo $user_info['id']; ?>">Admin history</a></p>
+			<p><a href="/admin/ban_user/<?php echo $user_info['id']; ?>">Ban user</a> &bull; <a href="/admin/notify/<?php echo $user_info['id']; ?>">Send notification</a> &bull; <a href="/admin/history/<?php echo $user_info['id']; ?>">Admin history</a><?php
+			$result = $db->query('SELECT 1 FROM bans
+			WHERE user_id=' . $user_info['id']) or error('Failed to check if user is banned', __FILE__, __LINE__, $db->error()); 
+			if ($db->num_rows($result)) {
+				echo ' - <b style="color:#F00">User is banned</b>';
+			} ?> &bull; <a href="?assumeid">Assume identity</a></p>
 			<?php if ($ms_user['is_admin']) { ?>
 			<form action="<?php echo $url; ?>" method="post" enctype="multipart/form-data">
 				<table border="0">
@@ -259,6 +269,7 @@ if ($me) {
 					</tr>
 				</table>
 				<p><a href="/admin/delete_user/<?php echo $user_info['id']; ?>">Delete user</a></p>
+				<p>Image service allowed? <input type="radio" name="imgsrv" value="1" <?php if ($user_info['imgsrv']) echo ' checked="checked"'; ?> />Yes <input type="radio" name="imgsrv" value="0" <?php if (!$user_info['imgsrv']) echo ' checked="checked"'; ?> />No - <a href="/imgsrv?uid=<?php echo $user_info['id']; ?>">Uploaded images</a></p>
 				<p><input type="submit" value="Update admin stuff" /></p>
 			</form>
 			<?php }

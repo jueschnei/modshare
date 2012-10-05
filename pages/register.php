@@ -17,6 +17,9 @@ if (isset($_POST['username'])) {
 	if ($db->num_rows($result)) {
 		$errors[] = 'User already exists';
 	}
+	if (file_get_contents('http://scratch.mit.edu/api/getnumprojectsbyuser/' . rawurlencode($_POST['username'])) == '0') {
+		$errors[] = 'Your registration has been detected as spam. Please contact us on our Scratch thread to appeal this.';
+	}
 	if (empty($errors)) {
 		$db->query('INSERT INTO users(username,password_hash,registered,registration_ip)
 		VALUES(\'' . $db->escape($_POST['username']) . '\',\'' . $db->escape(ms_hash($_POST['pwd1'])) . '\',' . time() . ',\'' . $db->escape($_SERVER['REMOTE_ADDR']) . '\')') or error('Failed to create user', __FILE__, __LINE__, $db->error());

@@ -35,5 +35,7 @@
 <div class="end-box"><div><!-- Bottom corners --></div></div>
 </div>
 
+<ms_footer>
+
 </body>
 </html>

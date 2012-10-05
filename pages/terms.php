@@ -15,7 +15,7 @@ $page_title = 'Terms of Use - Mod Share';
 		<li>Inappropriate or adult content</li>
 		<li>Spam, SEO, or anything else that abuses the system resources</li>
 		<li>Lies, fake, or hoax information (unless it's obvious it is a joke)</li>
-	
+		<li>No insults, rudeness, or anything just plain mean</li>
 	</ul>
 </p>
 <h3>Privacy policy</h3>

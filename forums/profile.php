@@ -1395,6 +1395,23 @@ else
 							<?php echo $posts_field ?>
 <?php if ($pun_user['is_admmod']): ?>							<label><?php echo $lang_profile['Admin note'] ?><br />
 							<input id="admin_note" type="text" name="admin_note" value="<?php echo pun_htmlspecialchars($user['admin_note']) ?>" size="30" maxlength="30" /><br /></label>
+							<label>Points: <?php
+							$result = $db->query('SELECT 1 FROM projects AS p
+							LEFT JOIN users AS u
+							ON u.id=p.uploaded_by
+							WHERE u.username=\'' . $db->escape($user['username']) . '\'') or error('Failed to get project count', __FILE__, __LINE__, $db->error());
+							$num_projects = $db->num_rows($result);
+							$days_registered = floor((time() - $user['registered']) / 60 / 60 / 24);
+							$score = floor((4 * $num_projects) + (.4 * $user['num_posts']) + $days_registered);
+							echo $score;
+							if ($num_projects < 1) {
+								echo ' - No projects';
+							}
+							if ($days_registered < 14) {
+								echo ' - Not registered for 14 days yet';
+							}
+							?>
+							</label>
 <?php endif; ?>						</div>
 					</fieldset>
 				</div>

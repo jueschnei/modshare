@@ -310,7 +310,7 @@ else
 // START SUBST - <ms_header>
 	ob_start();
 
-	include PUN_ROOT . '/ms_header.php';
+	include PUN_ROOT . '../includes/plain_header.php';
 
 $tpl_temp = trim(ob_get_contents());
 $tpl_main = str_replace('<ms_header>', $tpl_temp, $tpl_main);

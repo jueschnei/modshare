@@ -2,35 +2,48 @@
 $page_title = 'Upload - Mod Share';
 if (isset($_POST['title'])) {
 	if (isset($_POST['project'])) {
+		ob_end_clean();
 		if(isset($_POST['pwd'])) {
 			// check if user/pwd combo is correct
-			$post_user = $_POST['un'];
-			$post_pwd = ms_hash($_POST['pwd']);
+			$post_user = $db->escape($_POST['un']);
+			$post_pwd = $db->escape(ms_hash($_POST['pwd']));
 			$usercheck = $db->query("SELECT id, status FROM users WHERE username = '$post_user' AND password_hash = '$post_pwd'") or die('error');
 			if($db->num_rows($usercheck) == 1) {
 				$unresult = $db->fetch_assoc($usercheck);
 				if($unresult['status'] != 'normal') {
 					die('banned');
 				}
-				$db->query('INSERT INTO projects(title,filename,description,license,uploaded_by,modification,time,ip_addr)
-				VALUES(\'' . $db->escape($_POST['title']) . '\',
-				\'' . $db->escape($_POST['title'] . '.' . $modlist[$_POST['mod']]['extension']) . '\',
-				\'' . $db->escape($_POST['description']) . '\',
-				\'' . $db->escape($_POST['license']) . '\',
-				' . $unresult['id'] . ',
-				\'' . $db->escape($_POST['mod']) . '\',
-				' . time() . ',
-				\'' . $_SERVER['REMOTE_ADDR'] . '\')') or die('error' . $db->error());
-				file_put_contents(SRV_ROOT . '/data/projects/' . $db->insert_id(), $_POST['project']);
+				$result = $db->query('SELECT id FROM projects
+				WHERE title=\'' . $db->escape($_POST['title']) . '\'
+				AND uploaded_by=' . $unresult['id']) or die('error' . $db->error() . '-' . __LINE__);
+				if ($db->num_rows($result)) {
+					list($id) = $db->fetch_row($result);
+					$db->query('UPDATE projects
+					SET status=\'normal\',time=' . $_SERVER['REQUEST_TIME'] . '
+					WHERE title=\'' . $db->escape($_POST['title']) . '\'
+					AND uploaded_by=' . $unresult['id']) or die('error' . $db->error() . '-' . __LINE__);
+				} else {
+					$db->query('INSERT INTO projects(title,filename,description,license,uploaded_by,modification,time,ip_addr)
+					VALUES(\'' . $db->escape($_POST['title']) . '\',
+					\'' . $db->escape($_POST['title'] . '.' . $modlist[$_POST['mod']]['extension']) . '\',
+					\'' . $db->escape($_POST['description']) . '\',
+					\'' . $db->escape($_POST['license']) . '\',
+					' . $unresult['id'] . ',
+					\'' . $db->escape($_POST['mod']) . '\',
+					' . time() . ',
+					\'' . $_SERVER['REMOTE_ADDR'] . '\')') or die('error' . $db->error());
+					$id = $db->insert_id();
+				}
+				file_put_contents(SRV_ROOT . '/data/projects/' . $id, $_POST['project']);
 				// make thumbnail
 				include SRV_ROOT . '/includes/thumbnail.php';
 				if(isset($_POST['thumbnail'])) {
 					$thumb = $_POST['thumbnail'];
 				} else {
-					$thumb = makeThumbnailFromProj(SRV_ROOT . '/data/projects/' . $db->insert_id());
+					$thumb = makeThumbnailFromProj(SRV_ROOT . '/data/projects/' . $id);
 				}
-				$db->query('UPDATE projects SET thumbnail=\'' . $db->escape($thumb) . '\' WHERE id=' . $db->insert_id());
-				echo 'success';
+				$db->query('UPDATE projects SET thumbnail=\'' . $db->escape($thumb) . '\' WHERE id=' . $id);
+				echo 'success'; die;
 			} else {
 				die('badlogin');
 			}
@@ -45,6 +58,7 @@ if (isset($_POST['title'])) {
 			file_put_contents(SRV_ROOT . '/data/uploadqueue/' . $db->insert_id(), $_POST['project']);
 			echo 'queued';
 		}
+		unlink(SRV_ROOT . '/cache/cache_projects.php');
 	}
 	if ((isset($_POST['data']) || $_FILES['pfile']['error'] === 0) && $_FILES['thumbnail']['error'] == '0') {
 		$ext = explode('.', $_FILES['pfile']['name']);
@@ -67,6 +81,7 @@ if (isset($_POST['title'])) {
 		move_uploaded_file($_FILES['pfile']['tmp_name'], SRV_ROOT . '/data/projects/' . $db->insert_id());
 		
 		addlog('Project ' . $db->insert_id() . ' uploaded: ' . $_POST['title']);
+		unlink(SRV_ROOT . '/cache/cache_projects.php');
 		header('Location: /projects/' . $ms_user['username'] . '/' . $db->insert_id()); die;
 	} else {
 		$problem = true;
@@ -126,5 +141,5 @@ if ($problem) {
 			</td>
 		</tr>
 	</table>
-	<input type="submit" value="Upload" />
+	<p><input type="submit" value="Upload" /></p>
 </form>

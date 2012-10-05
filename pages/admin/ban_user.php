@@ -17,7 +17,6 @@ if (isset($_POST['form_sent'])) {
 	
 	addlog('User ban updated for ' . intval($dirs[3]));
 	
-	
 	header('Location: /admin/bans'); die;
 }
 $result = $db->query('SELECT username FROM users
@@ -39,12 +38,12 @@ if ($db->num_rows($result)) {
 			<td><input type="text" name="username" value="<?php echo clearHTML($user_info['username']); ?>" readonly="readonly" /></td>
 		</tr>
 		<tr>
-			<td>IP</td>
+			<td>IPs<br />Separate with commas</td>
 			<td><input type="text" name="ip" /><!--add last seen IP here at some point--></td>
 		</tr>
 		<tr>
 			<td>Message</td>
-			<td><input type="text" name="message" /></td>
+			<td><input type="text" name="message" size="100" /></td>
 		</tr>
 		<tr>
 			<td>Expires (e.g. <?php echo date('d M Y'); ?>)</td>

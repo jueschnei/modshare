@@ -141,6 +141,9 @@ function set_config($key, $value) {
 	$val = $db->escape($val);
 	$db->query('UPDATE config SET c_value = \'' . $val . '\' WHERE c_name = \'' . $key . '\'') or error('Failed to update config', __FILE__, __LINE__, $db->error());
 	$ms_config[$key] = $val;
+	if (file_exists(SRV_ROOT . '/cache/cache_config.php')) {
+		unlink(SRV_ROOT . '/cache/cache_config.php');
+	}
 }
 
 // add a log entry

@@ -29,6 +29,13 @@ if (isset($_POST['zap_id']))
 
 	$result = $db->query('SELECT zapped FROM '.$db->prefix.'reports WHERE id='.$zap_id) or error('Unable to fetch report info', __FILE__, __LINE__, $db->error());
 	$zapped = $db->result($result);
+	
+	$result = $db->query('SELECT post_id FROM '.$db->prefix.'reports WHERE id='.$zap_id) or error('Unable to fetch report info', __FILE__, __LINE__, $db->error());
+	$post_id = $db->result($result);
+	
+	$db->query('UPDATE ' . $db->prefix . 'posts
+	SET num_reports=0
+	WHERE id=' . $post_id) or error('Failed to un-hide post', __FILE__, __LINE__, $db->error()); //un-hide post if it is hidden from too many reports
 
 	if ($zapped == '')
 		$db->query('UPDATE '.$db->prefix.'reports SET zapped='.time().', zapped_by='.$pun_user['id'].' WHERE id='.$zap_id) or error('Unable to zap report', __FILE__, __LINE__, $db->error());

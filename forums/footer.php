@@ -15,6 +15,14 @@ $tpl_main = str_replace('<pun_main>', $tpl_temp, $tpl_main);
 ob_end_clean();
 // END SUBST - <pun_main>
 
+// START SUBST - <ms_footer>
+ob_start();
+include PUN_ROOT . '../includes/plain_footer.php';
+$tpl_temp = trim(ob_get_contents());
+$tpl_main = str_replace('<ms_footer>', $tpl_temp, $tpl_main);
+ob_end_clean();
+// END SUBST - <ms_footer>
+
 
 // START SUBST - <pun_footer>
 ob_start();

@@ -47,12 +47,19 @@ if (!$db) {
 	error('Failed to start database', __FILE__, __LINE__, $db->connect_error());
 }
 
-//get site config from database
-$ms_config = array();
-$result = $db->query('SELECT c_name,c_value FROM config');
-while ($c_field = $db->fetch_assoc($result)) {
-	$ms_config[$c_field['c_name']] = $c_field['c_value'];
+//get site config from database (or cache)
+if (!file_exists(SRV_ROOT . '/cache/cache_config.php')) {
+	$ms_config = array();
+	$result = $db->query('SELECT c_name,c_value FROM config');
+	while ($c_field = $db->fetch_assoc($result)) {
+		$ms_config[$c_field['c_name']] = $c_field['c_value'];
+	}
+	$data = '<?php' . "\n" . '$ms_config = ';
+	$data .= var_export($ms_config, true);
+	$data .= ';';
+	file_put_contents(SRV_ROOT . '/cache/cache_config.php', $data);
 }
+include SRV_ROOT . '/cache/cache_config.php';
 
 //fix $_POST if necessary (remove the backslashes)
 function stripslashes_array($array) {
@@ -82,19 +89,31 @@ $dirs = explode('/', $url);
 $base = dirname($url);
 
 //check for bans
-if ($ms_user['valid']) {
-	$result = $db->query('SELECT 1 FROM bans
-	WHERE (user_id=' . $ms_user['id'] . ' OR ip=\'' . $_SERVER['REMOTE_ADDR'] . '\')
-	AND expires>' . time()) or error('Failed to check bans', __FILE__, __LINE__, $db->error());
-} else {
-	$result = $db->query('SELECT 1 FROM bans
-	WHERE ip=\'' . $_SERVER['REMOTE_ADDR'] . '\'
-	AND expires>' . time()) or error('Failed to check bans', __FILE__, __LINE__, $db->error());
-}
-if ($db->num_rows($result)) {
+$result = $db->query('SELECT 1 FROM bans
+WHERE (user_id=' . ($ms_user['valid'] ? $ms_user['id'] : -1) . '
+OR ip=\'' . $_SERVER['REMOTE_ADDR'] . '\'
+OR ip LIKE \'%,' . $_SERVER['REMOTE_ADDR'] . '\'
+OR ip LIKE \'%,' . $_SERVER['REMOTE_ADDR'] . ',%\'
+OR IP LIKE \'' . $_SERVER['REMOTE_ADDR'] . ',%\')
+AND expires>' . time()) or error('Failed to check bans', __FILE__, __LINE__, $db->error());
+if ($db->num_rows($result) && !$ms_user['is_admin']) {
 	$ms_user['banned'] = true;
+	$_SESSION['banned'] = true;
 	if ($url != '/banned' && $url != '/styles/default.css' && $url != '/help') {
 		header('Location: /banned'); die;
+	}
+}
+
+// check whether to display mandatory voting
+if ($ms_config['election_mandatory'] == 'yes' && $ms_config['election']) {
+	if($ms_user['valid']) {
+		$result = $db->query('SELECT voter FROM election_voted WHERE voter=' . $ms_user['id']) or error('Failed to see if you have already voted', __FILE__, __LINE__, $db->error());
+		if(!$db->num_rows($result)) {
+			// show mandatory election page!
+			if ($url != '/vote' && $url != '/styles/default.css' && $url != '/styles/forums.css' && $url != '/logout') {
+				header('Location: /vote'); die;
+			}
+		}
 	}
 }
 
@@ -124,12 +143,20 @@ if ($ok) {
 	// output the header
 	if ($page_info['header'])
 		include SRV_ROOT . '/includes/header.php';
+		
+	//include a prepend
+	$continue = true;
+	if ($page_info['prepend']) {
+		include SRV_ROOT . $page_info['prepend'];
+	}
 	
-	// output page contents
-	if(file_exists(SRV_ROOT . '/pages/' . $page_info['file'])) {
-		include SRV_ROOT . '/pages/' . $page_info['file'];
-	} else {
-		echo '<p>Page not found.</p>';
+	if ($continue) {
+		// output page contents
+		if(file_exists(SRV_ROOT . '/pages/' . $page_info['file'])) {
+			include SRV_ROOT . '/pages/' . $page_info['file'];
+		} else {
+			echo '<p>Page not found.</p>';
+		}
 	}
 	
 	// output the footer

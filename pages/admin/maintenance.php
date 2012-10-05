@@ -17,9 +17,26 @@ if (isset($_POST['daysold'])) {
 	}
 	closedir($handle);
 }
+if (isset($_POST['deleteunassignedsessions'])) {
+	$handle = opendir(SRV_ROOT . '/sessions');
+	while ($file = readdir($handle)) {
+		if ($file != '.' && $file != '..') {
+			$path = SRV_ROOT . '/sessions/' . $file;
+			$contents = file_get_contents($path);
+			if (!strstr($contents, 'uid')) {
+				unlink($path);
+			}
+		}
+	}
+	closedir($handle);
+}
 ?>
 <h2>Maintenance</h2>
 <h3>Remove old sessions</h3>
 <form action="/admin/maintenance" method="post" enctype="multipart/form-data">
 	<p>Remove sessions older than <input type="text" name="daysold" size="1" value="7" /> day(s) old. <input type="submit" value="Go" /></p>
+</form>
+<h3>Remove sessions not assigned to a user</h3>
+<form action="/admin/maintenance" method="post" enctype="multipart/form-data">
+	<p><input type="submit" name="deleteunassignedsessions" value="Go" /></p>
 </form>

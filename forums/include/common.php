@@ -6,6 +6,7 @@
  * License: http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  */
 
+
 if (!defined('PUN_ROOT'))
 	exit('The constant PUN_ROOT must be defined and point to a valid FluxBB installation root directory.');
 
@@ -15,6 +16,9 @@ define('FORUM_VERSION', '1.4.9');
 define('FORUM_DB_REVISION', 15);
 define('FORUM_SI_REVISION', 2);
 define('FORUM_PARSER_REVISION', 2);
+
+//define some constants
+define('TOO_MANY_REPORTS', 3);
 
 // Block prefetch requests
 if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
@@ -281,8 +285,8 @@ if ($ms_user['valid'] && $ms_user['username'] != $pun_user['username']) {
 		$password_hash = pun_hash('modshare');
 		$email1 = 'none@given.com';
 		$group_id = 5;
-		$now = time();
-		$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, email_setting, timezone, dst, language, style, registered, registration_ip, last_visit) VALUES(\''.$db->escape($ms_user['username']).'\', '.$group_id.', \''.$password_hash.'\', \''.$db->escape($email1).'\', 2, 0, 0, \'English\', \''.$pun_config['o_default_style'].'\', '.$now.', \''.get_remote_address().'\', '.$now.')') or error('Unable to create user', __FILE__, __LINE__, $db->error());
+		$now = $ms_user['registered'];
+		$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, email_setting, timezone, dst, language, style, registered, registration_ip, last_visit) VALUES(\''.$db->escape($ms_user['username']).'\', '.$group_id.', \''.$password_hash.'\', \''.$db->escape($email1).'\', 2, 0, 0, \'English\', \''.$pun_config['o_default_style'].'\', '.$ms_user['registered'].', \''.get_remote_address().'\', '.$now.')') or error('Unable to create user', __FILE__, __LINE__, $db->error());
 		unlink(FORUM_CACHE_DIR . 'cache_users_info.php');
 		header('Refresh: 0'); die;
 	}
@@ -310,8 +314,12 @@ if ($ms_user['valid'] && !$pun_user['is_guest']) {
 	}
 	if ($pun_user['group_id'] == 5) {
 		//promote new Mod Share-ers to Mod Share-ers
-		$score = (.4 * $pun_user['num_posts']) + floor((time() - $pun_user['registered']) / 60 / 60 / 24);
-		if ($score > 40) {
+		$result = $db->query('SELECT 1 FROM projects
+		WHERE id=' . $ms_user['id']) or error('Failed to get project count', __FILE__, __LINE__, $db->error());
+		$num_projects = $db->num_rows($result);
+		$days_registered = floor((time() - $pun_user['registered']) / 60 / 60 / 24);
+		$score = floor((4 * $num_projects) + (.4 * $pun_user['num_posts']) + $days_registered);
+		if ($score > 30 && $num_projects > 0 && $pun_user['num_posts'] > 4 && $days_registered > 13) {
 			$db->query('UPDATE ' . $db->prefix . 'users
 			SET group_id=4
 			WHERE id=' . $pun_user['id']) or error('Failed to promote user', __FILE__, __LINE__, $db->error());
@@ -324,25 +332,12 @@ if (!$ms_user['valid'] && !$pun_user['is_guest']) {
 	// Remove user from "users online" list
 	$db->query('DELETE FROM '.$db->prefix.'online WHERE user_id='.$pun_user['id']) or error('Unable to delete from online list', __FILE__, __LINE__, $db->error());
 
-	// Update last_visit (make sure there's something to update it with)
-	if (isset($pun_user['logged']))
-		$db->query('UPDATE '.$db->prefix.'users SET last_visit='.$pun_user['logged'].' WHERE id='.$pun_user['id']) or error('Unable to update user visit data', __FILE__, __LINE__, $db->error());
-
 	pun_setcookie(1, pun_hash(uniqid(rand(), true)), time() + 31536000);
 }
 
 //check for bans
-if ($ms_user['valid']) {
-	$result = $db->query('SELECT 1 FROM bans
-	WHERE (user_id=' . $ms_user['id'] . ' OR ip=\'' . $_SERVER['REMOTE_ADDR'] . '\')
-	AND expires>' . time()) or error('Failed to check bans', __FILE__, __LINE__, $db->error());
-} else {
-	$result = $db->query('SELECT 1 FROM bans
-	WHERE ip=\'' . $_SERVER['REMOTE_ADDR'] . '\'
-	AND expires>' . time()) or error('Failed to check bans', __FILE__, __LINE__, $db->error());
-}
-if ($db->num_rows($result)) {
-	header('Location: /banned'); die;
+if ($_SESSION['banned'] && !$ms_user['is_admin']) {
+	header('Location: /banned');
 }
 
 //check if timezone is correct

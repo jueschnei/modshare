@@ -28,7 +28,6 @@ if (isset($_POST['un'])) {
 			if($user_info['password_hash'] == 'reset') {
 				header('Location: /forgot'); die;
 			}
-		} else {
 			//bad login, apprise the user of the situation
 			echo '<h2>Invalid login</h2>
 			<p>Invalid username or password. Hit the back button to try again.</p>

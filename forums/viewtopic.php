@@ -221,7 +221,7 @@ if (in_array($cur_topic['first_post_id'], $post_ids))
 	poll_display_topic($id, $pun_user['id'], $p, true);
 
 // Retrieve the posts (and their respective poster/online status)
-$result = $db->query('SELECT u.email, u.title, u.url, u.location, u.signature, u.email_setting, u.num_posts, u.registered, u.admin_note, p.id, p.poster AS username, p.poster_id, p.poster_ip, p.poster_email, p.message, p.hide_smilies, p.posted, p.edited, p.edited_by, g.g_id, g.g_user_title, o.user_id AS is_online FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'users AS u ON u.id=p.poster_id INNER JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id LEFT JOIN '.$db->prefix.'online AS o ON (o.user_id=u.id AND o.user_id!=1 AND o.idle=0) WHERE p.id IN ('.implode(',', $post_ids).') ORDER BY p.id', true) or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT u.email, u.title, u.url, u.location, u.signature, u.email_setting, u.num_posts, u.registered, u.admin_note, p.id, p.poster AS username, p.poster_id, p.poster_ip, p.poster_email, p.message, p.hide_smilies, p.posted, p.edited, p.edited_by, p.num_reports, g.g_id, g.g_user_title, o.user_id AS is_online FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'users AS u ON u.id=p.poster_id INNER JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id LEFT JOIN '.$db->prefix.'online AS o ON (o.user_id=u.id AND o.user_id!=1 AND o.idle=0) WHERE p.id IN ('.implode(',', $post_ids).') ORDER BY p.id', true) or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
 while ($cur_post = $db->fetch_assoc($result))
 {
 	$post_count++;
@@ -236,7 +236,7 @@ while ($cur_post = $db->fetch_assoc($result))
 	if ($cur_post['poster_id'] > 1)
 	{
 		if ($pun_user['g_view_users'] == '1')
-			$username = '<a href="profile.php?id='.$cur_post['poster_id'].'">'.pun_htmlspecialchars($cur_post['username']).'</a>';
+			$username = '<a href="/users/'.pun_htmlspecialchars($cur_post['username']).'">' . pun_htmlspecialchars($cur_post['username']) . '</a>';
 		else
 			$username = pun_htmlspecialchars($cur_post['username']);
 
@@ -337,7 +337,11 @@ while ($cur_post = $db->fetch_assoc($result))
 	}
 
 	// Perform the main parsing of the message (BBCode, smilies, censor words etc)
-	$cur_post['message'] = parse_message($cur_post['message'], $cur_post['hide_smilies']);
+	if ($cur_post['num_reports'] < TOO_MANY_REPORTS) {
+		$cur_post['message'] = parse_message($cur_post['message'], $cur_post['hide_smilies']);
+	} else {
+		$cur_post['message'] = '<div style="background-color:#F88; width:100%; text-align:center; vertical-align:middle; font-weight: bold; padding: 5px;">This post has been temporarily removed because several people reported it. Moderators will look at it and restore it if it is OK.</div>';
+	}
 
 	// Do signature parsing/caching
 	if ($pun_config['o_signatures'] == '1' && $cur_post['signature'] != '' && $pun_user['show_sig'] != '0')

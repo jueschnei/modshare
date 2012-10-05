@@ -1,6 +1,6 @@
 <?php
 
-include '../config/bootstrap.php';
+include PUN_ROOT . '../config/bootstrap.php';
 
 $db_type = 'mysqli';
 $db_host = $db_info['host'];

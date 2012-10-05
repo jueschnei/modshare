@@ -84,3 +84,27 @@ img {
 .ltd {
 	width:100px;
 }
+
+/* *********************FOOTER********************* */
+#footer {
+	box-shadow: 0 -3px 2px 0px #AAA;
+	padding: 0 10px;
+	background: #<?php if ($ms_config['status'] == 'warning') echo 'C00'; else echo $dark; ?>;
+	color: #<?php echo $lighter; ?>;
+} 
+#footer p {
+	margin: 0;
+	padding: 10px 0;
+}
+
+#footer a {
+	color: #<?php echo $light; ?>;
+	text-decoration: none;
+}
+
+.clearfloat { /* place after sidebar to inflate mainContents. this is already done in footer.php */
+	clear:both;
+    height:0;
+    font-size: 1px;
+    line-height: 0px;
+}

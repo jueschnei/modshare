@@ -2,9 +2,16 @@
 session_regenerate_id();
 $page_title = 'Banned - Mod Share';
 $result = $db->query('SELECT message FROM bans
-WHERE (user_id=' . ($ms_user['valid'] ? $ms_user['id'] : 0) . ' OR ip=\'' . $_SERVER['REMOTE_ADDR'] . '\')
-AND expires>' . time()) or error('Failed to check bans', __FILE__, __LINE__, $db->error());
+WHERE (user_id=' . ($ms_user['valid'] ? $ms_user['id'] : 0) . '
+	OR ip=\'' . $_SERVER['REMOTE_ADDR'] . '\'
+	OR ip LIKE \'%,' . $_SERVER['REMOTE_ADDR'] . '\'
+	OR ip LIKE \'%,' . $_SERVER['REMOTE_ADDR'] . ',%\'
+	OR IP LIKE \'' . $_SERVER['REMOTE_ADDR'] . ',%\')
+	AND expires>' . time()) or error('Failed to check bans', __FILE__, __LINE__, $db->error());
 if (!$db->num_rows($result)) {
+	$db->query('DELETE FROM bans
+	WHERE expires<' . time()) or error('Failed to delete old bans', __FILE__, __LINE__, $db->error());
+	unset($_SESSION['banned']);
 	header('Location: /'); die;
 }
 $ban_info = $db->fetch_assoc($result);

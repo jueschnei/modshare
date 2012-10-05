@@ -55,6 +55,7 @@ while($currlove = $db->fetch_assoc($lovequery)) {
 //download project
 if ($dirs[4] == 'download') {
 	ob_end_clean();
+	header('Content-type: application/x-scratch-project');
 	header('Content-disposition: attachment; filename=' . $project_info['filename']);
 	echo file_get_contents(SRV_ROOT . '/data/projects/' . intval($dirs[3]));
 	$db->query('UPDATE projects SET downloads=downloads+1
@@ -211,8 +212,8 @@ function comments() {
 		echo '<p>' . clearHTML($val[0]['content']) . '</p>';
 		if ($ms_user['valid']) {
 			echo '<p id="cd' . $key . '"><a style="cursor:pointer" onclick="replyToComment(' . $key . ')">Reply</a> &bull; <a style="cursor:pointer" onclick="flagComment(' . $key . ')">Flag as inappropriate</a>';
-			if ($ms_user['id'] == $project_info['uploaded_by'] || $ms_user['is_mod']) {
-				echo ' &bull; <a style="cursor:pointer" onclick="deleteComment(' . $key . ')">Delete</a>';
+			if (($ms_user['id'] == $project_info['uploaded_by'] && $val[0]['permission'] < 2) || $ms_user['is_mod']) {
+				echo ' &bull; <a style="cursor:pointer" onclick="deleteComment(' . $key . ')">Delete' . $val[0]['permission'] . '</a>';
 			}
 			if ($ms_user['is_mod']) {
 				echo ' &bull; <a href="/admin/search_ip/' . $val[0]['ip'] . '">' . $val[0]['ip'] . '</a>';
@@ -224,7 +225,7 @@ function comments() {
 			if ($subkey != 0) {
 				$outval = '<h5 style="margin-left: 15px; font-size:16px;">' . parse_username($subval) . ' - ' . gmdate('d M Y H:i:s', $subval['time'] + $timedelta) . '</h5><p style="margin-left: 15px">' . clearHTML($subval['content']) . '</p>';
 				$outval .= '<p style="margin-left: 15px">';
-				if ($ms_user['is_mod'] || $ms_user['id'] == $project_info['uploaded_by']) {
+				if ($ms_user['is_mod'] || ($ms_user['id'] == $project_info['uploaded_by'] && $subval['permission'] < 2)) {
 					$outval .= '<a onclick="deleteComment(' . $subkey . ')" style="cursor:pointer">Delete</a>';
 				}
 				if ($ms_user['is_mod']) {

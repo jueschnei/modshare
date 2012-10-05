@@ -159,9 +159,19 @@ if (isset($_POST['form_sent']))
 
 	$now = time();
 	
-	if ($pun_user['group_id'] == 5) {
+	if ($pun_user['group_id'] == 5 || $pun_user['group_id'] == 6) {
 		if (preg_match('%\[img(.*?)\]%i', $message)) {
-			$errors[] = 'New Mod Share-ers can\'t post images.';
+			switch ($pun_user['group_id']) {
+			case 5:
+				$errors[] = 'New Mod Share-ers can\'t post images.'; break;
+			case 6:
+				$errors[] = 'You can\'t post images.'; break;
+			}
+		}
+	}
+	if ($pun_user['group_id'] == 6) {
+		if (preg_match('%\[url(.*?)\]%i', $message)) {
+			$errors[] = 'You can\'t post links.';
 		}
 	}
 	
@@ -699,9 +709,8 @@ if (!empty($checkboxes))
 ?>
 			</div>
 			<?php
-			if ($pun_user['group_id'] == PUN_ADMIN || $fid == 7) {
-				poll_form_post($tid);
-			} ?>
+			poll_form_post($tid);
+			?>
 			<p class="buttons"><input type="submit" name="submit" value="<?php echo $lang_common['Submit'] ?>" tabindex="<?php echo $cur_index++ ?>" accesskey="s" /> <input type="submit" name="preview" value="<?php echo $lang_post['Preview'] ?>" tabindex="<?php echo $cur_index++ ?>" accesskey="p" /> <a href="javascript:history.go(-1)"><?php echo $lang_common['Go back'] ?></a></p>
 		</form>
 	</div>

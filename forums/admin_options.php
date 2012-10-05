@@ -381,7 +381,7 @@ generate_admin_menu('options');
 								<tr>
 									<th scope="row"><?php echo $lang_admin_options['Visit timeout label'] ?></th>
 									<td>
-										<input type="text" name="form[timeout_visit]" size="5" maxlength="5" value="<?php echo $pun_config['o_timeout_visit'] ?>" />
+										<input type="text" name="form[timeout_visit]" size="7" maxlength="7" value="<?php echo $pun_config['o_timeout_visit'] ?>" />
 										<span><?php echo $lang_admin_options['Visit timeout help'] ?></span>
 									</td>
 								</tr>

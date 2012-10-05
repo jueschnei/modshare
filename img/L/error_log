@@ -1,0 +1,1 @@
+[02-Oct-2012 01:34:00 UTC] PHP Warning:  imagepng() [<a href='function.imagepng'>function.imagepng</a>]: gd-png error: no colors in palette in /home/modshare/public_html/img/L/a.php on line 5

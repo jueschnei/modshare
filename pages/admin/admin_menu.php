@@ -15,8 +15,21 @@ if (isset($_POST['form_sent'])) {
 if(isset($_POST['goquery'])) {
 	$qry = $_POST['qry'];
 	$result = $db->query($qry) or error('Failed MySQL query', __FILE__, __LINE__, $db->error());
-	while($currdata = $db->fetch_assoc($result)) {
-		$mysqlresponse .= chr(13) . print_r($currdata);
+	if ($db->num_rows($result)) {
+		echo '<h3>Query results</h3>';
+		echo '<table border="0">';
+		$fields = $db->fetch_fields($result);
+		echo '<tr>';
+		foreach ($fields as $val) {
+			echo '<th>' . $val->name . '</th>';
+		}
+		echo '</tr>';
+		$outresults = array();
+		while($currdata = $db->fetch_assoc($result)) {
+			$outresults[] = '<tr><td>' . implode('</td><td>', $currdata) . '</td></tr>';
+		}
+		echo implode($outresults);
+		echo '</table>';
 	}
 	addlog('Executed custom query: ' . $qry);
 }
@@ -36,7 +49,7 @@ if(isset($_POST['goquery'])) {
 <h3>MySQL query</h3>
 <form id="mysql" name="mysql" method="post" action="/admin/admin_menu">
   <p>
-    <input name="qry" type="text" id="qry" size="40" style="min-height: 20px;" />
+    <textarea name="qry" rows="5" cols="50"></textarea><br />
     <input type="submit" name="goquery" id="goquery" value="Submit" style="min-height: 26px;" />
   </p>
 </form>

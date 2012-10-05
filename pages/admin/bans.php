@@ -4,7 +4,7 @@ $page_title = 'Bans - Mod Share';
 <?php
 $db->query('DELETE FROM bans
 WHERE expires<' . time()) or error('Failed to remove old bans', __FILE__, __LINE__, $db->error());
-$result = $db->query('SELECT b.id,b.user_id,b.ip,u.username FROM bans AS b
+$result = $db->query('SELECT b.id,b.user_id,b.ip,b.expires,b.message,u.username FROM bans AS b
 LEFT JOIN users AS u ON u.id=b.user_id') or error('Failed to check bans', __FILE__, __LINE__, $db->error());
 ?>
 <h2>Manage bans</h2>
@@ -12,7 +12,9 @@ LEFT JOIN users AS u ON u.id=b.user_id') or error('Failed to check bans', __FILE
 <table border="0">
 	<tr>
 		<th>Username</th>
-		<th>IP address</th>
+		<th>IP addresses</th>
+		<th>Expires</th>
+		<th>Message</th>
 		<th>Edit</th>
 	</tr>
 	<?php
@@ -20,6 +22,8 @@ LEFT JOIN users AS u ON u.id=b.user_id') or error('Failed to check bans', __FILE
 		echo '<tr>
 		<td>' . clearHTML($cur_ban['username']) . '</td>
 		<td>' . $cur_ban['ip'] . '</td>
+		<td>' . format_date($cur_ban['expires'], true) . '</td>
+		<td>' . clearHTML($cur_ban['message']) . '</td>
 		<td><a href="/admin/edit_ban/' . $cur_ban['id'] . '">Edit</a></td>
 	</tr>';
 	}

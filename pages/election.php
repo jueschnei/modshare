@@ -19,6 +19,9 @@ ORDER BY text ASC') or error('Failed to get election options', __FILE__, __LINE_
 ?>
 <h2>Election</h2>
 <h3><?php echo $ms_config['election_question']; ?></h3>
+<?php if ($ms_config['election_mandatory']) { ?>
+<p>You have been redirected to this page because voting is required. Please vote to access the rest of the site.</p>
+<?php } ?>
 <form action="/vote" method="post" enctype="multipart/form-data">
 	<table border="0">
 	<?php

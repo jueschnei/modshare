@@ -8,7 +8,7 @@ $page_title = 'Mod Share IV';
 $result = $db->query('SELECT p.id,p.title,p.thumbnail,u.username FROM projects AS p
 LEFT JOIN users AS u
 ON u.id=p.uploaded_by
-WHERE p.status<>\'deleted\'
+WHERE p.status=\'normal\'
 ORDER BY p.time DESC
 LIMIT 0,3') or error('Failed to get latest projects', __FILE__, __LINE__, $db->error());
 if ($db->num_rows($result)) {

@@ -88,6 +88,15 @@ $pages = array(
 		'prepend'	=> null
 	),
 	
+	//******************** ELECTION *********************//
+	
+	'/vote' => array(
+		'file'		=> 'election.php',
+		'header'	=> true,
+		'permission'=> 1,
+		'prepend'	=> null
+	),
+	
 	//******************** ADMIN *********************//
 	
 	'/admin/mod_menu' => array(
@@ -139,6 +148,13 @@ $pages = array(
 		'prepend'	=> null
 	),
 	
+	'/admin/return' => array(
+		'file'		=> 'admin/return.php',
+		'header'	=> true,
+		'permission'=> 0,
+		'prepend'	=> null
+	),
+	
 	//******************** AJAX *********************//
 	'/ajax/delnotification' => array(
 		'file'		=> 'ajax/delnotification.php',
@@ -162,6 +178,15 @@ $pages = array(
 		'permission'=> 0,
 		'prepend'	=> null
 	),
+	
+	//******************** IMAGE SERVICE *********************//
+	
+	'/imgsrv' => array(
+		'file'		=> 'imgsrv/home.php',
+		'header'	=> true,
+		'permission'=> 1,
+		'prepend'	=> '/pages/imgsrv/prepend.php'
+	),
 
 	//******************** MISC. *********************//
 
@@ -176,13 +201,6 @@ $pages = array(
 		'file'		=> 'terms.php',
 		'header'	=> true,
 		'permission'=> 0,
-		'prepend'	=> null
-	),
-	
-	'/vote' => array(
-		'file'		=> 'election.php',
-		'header'	=> true,
-		'permission'=> 1,
 		'prepend'	=> null
 	),
 );
@@ -300,6 +318,13 @@ $pageswithsubdirs = array(
 	
 	'/api' => array(
 		'file'		=> 'api/main.php',
+		'header'	=> false,
+		'permission'=> 0,
+		'prepend'	=> null
+	),
+	
+	'/imgsrv/view' => array(
+		'file'		=> 'imgsrv/view.php',
 		'header'	=> false,
 		'permission'=> 0,
 		'prepend'	=> null

@@ -45,6 +45,8 @@ if (($pun_user['g_edit_posts'] == '0' ||
 	!$is_admmod)
 	message($lang_common['No permission'], false, '403 Forbidden');
 
+$me = ($cur_post['poster_id'] == $pun_user['id']);
+
 // Load the post.php/edit.php language file
 require PUN_ROOT.'lang/'.$pun_user['language'].'/post.php';
 
@@ -260,7 +262,7 @@ if ($pun_config['o_smilies'] == '1')
 if ($is_admmod)
 {
 	//if ((isset($_POST['form_sent']) && isset($_POST['silent'])) || !isset($_POST['form_sent']))
-	if (isset($_POST['silent']))
+	if (isset($_POST['silent']) || ($me && !isset($_POST['silent'])))
 		$checkboxes[] = '<label><input type="checkbox" name="silent" value="1" tabindex="'.($cur_index++).'" checked="checked" />'.$lang_post['Silent edit'].'<br /></label>';
 	else
 		$checkboxes[] = '<label><input type="checkbox" name="silent" value="1" tabindex="'.($cur_index++).'" />'.$lang_post['Silent edit'].'<br /></label>';
@@ -286,7 +288,7 @@ if (!empty($checkboxes))
 
 ?>
 			</div>
-			<?php if ($can_edit_subject && ($pun_user['group_id'] == PUN_ADMIN || $fid == 7)) poll_form_edit($cur_post['tid']); ?>
+			<?php if ($can_edit_subject) poll_form_edit($cur_post['tid']); ?>
 			<p class="buttons"><input type="submit" name="submit" value="<?php echo $lang_common['Submit'] ?>" tabindex="<?php echo $cur_index++ ?>" accesskey="s" /> <input type="submit" name="preview" value="<?php echo $lang_post['Preview'] ?>" tabindex="<?php echo $cur_index++ ?>" accesskey="p" /> <a href="javascript:history.go(-1)"><?php echo $lang_common['Go back'] ?></a></p>
 		</form>
 	</div>
