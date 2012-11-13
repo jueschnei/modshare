@@ -11,7 +11,12 @@ class databasetool {
 	var $num_queries;
 
 	function __construct($info) { # start the database, class constructor
-		$this->link = mysqli_connect($info['host'], $info['user'], $info['pass'], $info['name']);
+		$this->link = @mysqli_connect($info['host'], $info['user'], $info['pass'], $info['name']);
+		if ($this->link) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	function connect_error() { # return the connect error

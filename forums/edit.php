@@ -94,6 +94,10 @@ if (isset($_POST['form_sent']))
 		require PUN_ROOT.'include/parser.php';
 		$message = preparse_bbcode($message, $errors);
 	}
+	
+	if (containsBadWords($message) || containsBadWords($subject)) {
+		$errors[] = 'Please do not use inappropriate words on Mod Share';
+	}
 
 	if (empty($errors))
 	{
@@ -293,6 +297,11 @@ if (!empty($checkboxes))
 		</form>
 	</div>
 </div>
+
+<script type="text/javascript" src="/forums/ext/scratchblocks/blocksplugin.js"></script>
+<script type="text/javascript">
+scratchBlocksPlugin.parse({containerTag: 'pre', containerClass: 'blocks'});
+</script>
 <?php
 
 require PUN_ROOT.'footer.php';

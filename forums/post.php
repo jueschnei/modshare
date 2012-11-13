@@ -175,6 +175,10 @@ if (isset($_POST['form_sent']))
 		}
 	}
 	
+	if (containsBadWords($message) || containsBadWords($subject)) {
+		$errors[] = 'Please do not use inappropriate words on Mod Share.';
+	}
+	
 	poll_form_validate($tid, $errors);
 
 	// Did everything go according to plan?

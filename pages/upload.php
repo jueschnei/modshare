@@ -7,10 +7,17 @@ if (isset($_POST['title'])) {
 			// check if user/pwd combo is correct
 			$post_user = $db->escape($_POST['un']);
 			$post_pwd = $db->escape(ms_hash($_POST['pwd']));
-			$usercheck = $db->query("SELECT id, status FROM users WHERE username = '$post_user' AND password_hash = '$post_pwd'") or die('error');
+			$usercheck = $db->query('SELECT id, status FROM users WHERE username = \'' . $post_user . '\' AND password_hash=\'' . $post_pwd . '\'') or die('error-' . __LINE__ . '-' . $db->error());
 			if($db->num_rows($usercheck) == 1) {
 				$unresult = $db->fetch_assoc($usercheck);
-				if($unresult['status'] != 'normal') {
+				$ban_result = $db->query('SELECT 1 FROM bans
+				WHERE (user_id=' . $unresult['id'] . '
+				OR ip=\'' . $_SERVER['REMOTE_ADDR'] . '\'
+				OR ip LIKE \'%,' . $_SERVER['REMOTE_ADDR'] . '\'
+				OR ip LIKE \'%,' . $_SERVER['REMOTE_ADDR'] . ',%\'
+				OR IP LIKE \'' . $_SERVER['REMOTE_ADDR'] . ',%\')
+				AND expires>' . time()) or die('Failed to check bans-' . __LINE__ . '-' . $db->error());
+				if($unresult['status'] != 'normal' || $db->num_rows($ban_result)) {
 					die('banned');
 				}
 				$result = $db->query('SELECT id FROM projects
@@ -63,6 +70,9 @@ if (isset($_POST['title'])) {
 	if ((isset($_POST['data']) || $_FILES['pfile']['error'] === 0) && $_FILES['thumbnail']['error'] == '0') {
 		$ext = explode('.', $_FILES['pfile']['name']);
 		$ext = end($ext);
+		if (containsBadWords($_POST['desc'])) {
+			echo 'Please do not use inappropriate words on Mod Share.'; return;
+		}
 		if ($modlist[$_POST['mod']]['extension'] != $ext) {
 			echo 'Invalid file extension.';
 			return;
@@ -88,16 +98,17 @@ if (isset($_POST['title'])) {
 	}
 }
 if (!$ms_user['valid']) {
-	echo 'failed';
+	echo 'You lack permission to view this page.';
+	return;
 }
 ?>
 <h2>Upload to Mod Share</h2>
 <?php
 if ($problem) {
-	if (!is_uploaded_file($_FILES['pfile'])) {
+	if ($_FILES['pfile']['error'] !== 0) {
 		echo '<p>No project file found</p>';
 	}
-	if (!is_uploaded_file($_FILES['thumbnail'])) {
+	if ($_FILES['thumbnail']['error'] !== 0) {
 		echo '<p>No thumbnail file found</p>';
 	}
 }

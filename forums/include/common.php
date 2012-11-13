@@ -18,7 +18,7 @@ define('FORUM_SI_REVISION', 2);
 define('FORUM_PARSER_REVISION', 2);
 
 //define some constants
-define('TOO_MANY_REPORTS', 3);
+define('TOO_MANY_REPORTS', 3); //after this many reports, the post will be hidden and the poster banned for 24 hours
 
 // Block prefetch requests
 if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
@@ -202,13 +202,14 @@ if (!defined('PUN_SEARCH_MAX_WORD'))
 if (!defined('FORUM_MAX_COOKIE_SIZE'))
 	define('FORUM_MAX_COOKIE_SIZE', 4048);
 
-ini_set('session.save_path', PUN_ROOT . '../sessions');
+ini_set('session.save_path', SRV_ROOT . '/sessions');
 ini_set('session.name', 'MODSHARESESSIONID');
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 7);
 ini_set('session.cookie_lifetime', 60 * 60 * 24 * 7);
 session_start();
 $forums = true;
-include PUN_ROOT . '/../includes/global_functions.php';
+include SRV_ROOT . '/includes/global_functions.php';
+include SRV_ROOT . '/includes/filter.php';
 check_user($ms_user);
 if ($ms_user['valid'] && $ms_user['username'] != $pun_user['username']) {
 	//do something!
@@ -335,15 +336,14 @@ if (!$ms_user['valid'] && !$pun_user['is_guest']) {
 	pun_setcookie(1, pun_hash(uniqid(rand(), true)), time() + 31536000);
 }
 
-//check for bans
-if ($_SESSION['banned'] && !$ms_user['is_admin']) {
-	header('Location: /banned');
-}
-
 //check if timezone is correct
 if ($ms_user['valid'] && $pun_user['timezone'] != $ms_user['timezone']) {
 	$db->query('UPDATE ' . $db->prefix . 'users
 	SET timezone=' . $ms_user['timezone'] . '
 	WHERE id=' . $pun_user['id']) or error('Failed to update time zone', __FILE__, __LINE__, $db->error());
 	header('Refresh: 0'); die;
+}
+
+if ($_SESSION['banned']) {
+	header('Location: /banned'); die;
 }

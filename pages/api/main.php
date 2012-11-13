@@ -189,9 +189,19 @@ if ($dirs[2] == 'getallusers') {
 		echo 'false';
 	}
 	
+} elseif ($dirs[2] == 'getallprojectsinfo') {
+	$result = $db->query('SELECT id,title FROM projects
+	' . ($dirs[3] == 'insanity' ? 'WHERE modification LIKE \'insanity%\'' : '') . '
+	ORDER BY time DESC
+	LIMIT 3') or error('Failed to get projects', __FILE__, __LINE__, $db->error());
+	while ($cur_project = $db->fetch_assoc($result)) {
+		$ids[] = $cur_project['id'] . ':' . str_replace('|', '_', $cur_project['title'], str_replace(':', '_', str_replace("\n", '', $cur_project['title'])));
+	}
+	echo implode($ids, "|");
 } elseif($dirs[2] == '') {
 	// Show help page
-	echo '<html><head><title>Mod Share API</title></head><body><h2>Mod Share 4 - API Documentation</h2>';
+	ob_start();
+	include SRV_ROOT . '/includes/header.php';
 	echo '<p>This page serves as a quick reference to the API that allows other applications to connect with Mod Share 4.</p>';
 	echo '<h4>Get all users</h4>';
 	echo '<p>URL: /api/getallusers<br />
@@ -237,7 +247,11 @@ if ($dirs[2] == 'getallusers') {
 	Example response: 4:banned</p>';
 	
 	echo '<p></p>';
-	echo '</body></html>';
+	include SRV_ROOT . '/includes/footer.php';
+	$data = ob_get_contents();
+	$data = str_replace('<$page_title/>', 'Mod Share API', $data);
+	ob_end_clean();
+	echo $data;
 
 } else {
 

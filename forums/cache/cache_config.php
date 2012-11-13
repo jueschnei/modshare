@@ -49,9 +49,9 @@ $pun_config = array (
   'o_avatars_height' => '60',
   'o_avatars_size' => '10240',
   'o_search_all_forums' => '1',
-  'o_base_url' => 'http://modshare.tk/forums',
-  'o_admin_email' => 'jacob@futuresight.org',
-  'o_webmaster_email' => 'jacob@futuresight.org',
+  'o_base_url' => 'http://modshare.org/forums',
+  'o_admin_email' => 'helpdesk@futuresight.org',
+  'o_webmaster_email' => 'no-reply@modshare.tk',
   'o_forum_subscriptions' => '0',
   'o_topic_subscriptions' => '0',
   'o_smtp_host' => NULL,
@@ -60,7 +60,7 @@ $pun_config = array (
   'o_smtp_ssl' => '0',
   'o_regs_allow' => '1',
   'o_regs_verify' => '0',
-  'o_announcement' => '1',
+  'o_announcement' => '0',
   'o_announcement_message' => '<b style="font-weight: bold; font-size: 18px">Moderator elections have begun! <a href="/vote">Vote here</a>!</b>',
   'o_rules' => '0',
   'o_rules_message' => 'Enter your rules here',
@@ -86,7 +86,7 @@ $pun_config = array (
   'o_poll_max_field' => '10',
   'o_poll_time' => '0',
   'o_poll_term' => '0',
-  'o_poll_guest' => '0',
+  'o_poll_guest' => '1',
 );
 
 ?>

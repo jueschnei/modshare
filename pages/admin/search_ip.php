@@ -1,16 +1,16 @@
 <?php
 $page_title = 'Search results - Mod Share';
-$ip = $db->escape($dirs[3]);
+$ip = $db->escape(str_replace('*', '%', $dirs[3]));
 $results = array();
 $results['forums'] = $db->query('SELECT p.id,p.topic_id,p.poster,t.subject FROM flux_posts AS p
 LEFT JOIN flux_topics AS t
 ON t.id=p.topic_id
-WHERE p.poster_ip=\'' . $ip . '\'
+WHERE p.poster_ip LIKE \'' . $ip . '\'
 ORDER BY p.posted DESC') or error('Failed to check forum posts', __FILE__, __LINE__, $db->error());
 $results['projects'] = $db->query('SELECT p.id,p.title,u.username,u.permission FROM projects AS p
 LEFT JOIN users AS u
 ON u.id=p.uploaded_by
-WHERE p.ip_addr=\'' . $ip . '\'
+WHERE p.ip_addr LIKE \'' . $ip . '\'
 ORDER BY p.time DESC') or error('Failed to check projects', __FILE__, __LINE__, $db->error());
 $results['comments'] = $db->query('SELECT c.content,u.username,u.permission,p.title AS project_title,p.id AS pid,pa.username AS project_author FROM comments AS c
 LEFT JOIN users AS u
@@ -19,10 +19,10 @@ LEFT JOIN projects AS p
 ON p.id=c.project
 LEFT JOIN users AS pa
 ON pa.id=p.uploaded_by
-WHERE c.ip_addr=\'' . $ip . '\'
+WHERE c.ip_addr LIKE \'' . $ip . '\'
 ORDER BY c.posted DESC') or error('Failed to check comments', __FILE__, __LINE__, $db->error());
 $results['registrations'] = $db->query('SELECT username,permission FROM users
-WHERE registration_ip=\'' . $ip . '\'
+WHERE registration_ip LIKE \'' . $ip . '\'
 ORDER BY registered DESC') or error('Failed to get registered users', __FILE__, __LINE__, $db->error());
 echo '<h2>Search results for "' . $ip . '"</h2>';
 if ($db->num_rows($results['forums'])) {

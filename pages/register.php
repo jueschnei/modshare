@@ -59,5 +59,6 @@ if (isset($_POST['username'])) {
 			<td><input type="password" name="scratchpwd" value="<?php echo clearHTML($_POST['scratchpwd']); ?>" /></td>
 		</tr>
 	</table>
-	<input type="submit" value="Register" />
+	<p>By signing up, you agree to our <a href="/terms">Terms of Use</a>. <span style="color:red; font-weight:bold">Hey, this is important! Actually read them! They are REALLY short!</span></p>
+	<p><input type="submit" value="Register" /></p>
 </form>

@@ -493,7 +493,7 @@ else
 					<?php
 					while($cur_trash = $db->fetch_assoc($result))
 					{
-						$topic_infos = '<a href="admin_loader.php?plugin=AMP_Trash_bin.php&amp;tid='.$cur_trash['id'].'">'.pun_htmlspecialchars($cur_trash['forum_name']).'&#160;»&#160;'.pun_htmlspecialchars($cur_trash['subject']).'</a>';
+						$topic_infos = '<a href="admin_loader.php?plugin=AMP_Trash_bin.php&amp;tid='.$cur_trash['id'].'">'.pun_htmlspecialchars($cur_trash['forum_name']).'&#160;&raquo;&#160;'.pun_htmlspecialchars($cur_trash['subject']).'</a>';
 						$trash_infos = $lang_admin_plugin_trash_bin['Trashed by'].' <a href="profile.php?id='.$cur_trash['trasher_id'].'">'.pun_htmlspecialchars($cur_trash['trasher']).'</a> ('.format_time($cur_trash['trashed']).')';
 						
 						?>
@@ -551,7 +551,7 @@ INNER JOIN '.$db->prefix.'topics AS t ON tp.topic_id = t.id AND tp.post_alone = 
 				<?php
 					while($cur_trash = $db->fetch_assoc($result))
 					{
-						$posts_infos = pun_htmlspecialchars($cur_trash['forum_name']).'&#160;»&#160;'.pun_htmlspecialchars($cur_trash['subject']).'&#160;»&#160;<a href="admin_loader.php?plugin=AMP_Trash_bin.php&amp;pid='.$cur_trash['id'].'">'.format_time($cur_trash['posted']).' '.$lang_common['by']. ' '.pun_htmlspecialchars($cur_trash['poster']).'</a>';
+						$posts_infos = pun_htmlspecialchars($cur_trash['forum_name']).'&#160;&raquo;&#160;'.pun_htmlspecialchars($cur_trash['subject']).'&#160;&raquo;&#160;<a href="admin_loader.php?plugin=AMP_Trash_bin.php&amp;pid='.$cur_trash['id'].'">'.format_time($cur_trash['posted']).' '.$lang_common['by']. ' '.pun_htmlspecialchars($cur_trash['poster']).'</a>';
 						if ($cur_trash['method'] == 1) {
 							$method = 'Edited by';
 						} else {
@@ -618,7 +618,7 @@ INNER JOIN '.$db->prefix.'topics AS t ON tp.topic_id = t.id AND tp.post_alone = 
 						<table>
 					
 							<tr>
-								<th><?php echo pun_htmlspecialchars($cur_topic['forum_name']) ?>&#160;»&#160;<?php echo pun_htmlspecialchars($cur_topic['subject']) ?></th>
+								<th><?php echo pun_htmlspecialchars($cur_topic['forum_name']) ?>&#160;&raquo;&#160;<?php echo pun_htmlspecialchars($cur_topic['subject']) ?></th>
 							</tr>
 							
 							<?php
@@ -656,7 +656,7 @@ INNER JOIN '.$db->prefix.'topics AS t ON tp.topic_id = t.id AND tp.post_alone = 
 						<table>
 					
 							<tr>
-								<th><?php echo pun_htmlspecialchars($cur_topic['forum_name']) ?>&#160;»&#160;<?php echo pun_htmlspecialchars($cur_topic['subject']) ?></th>
+								<th><?php echo pun_htmlspecialchars($cur_topic['forum_name']) ?>&#160;&raquo;&#160;<?php echo pun_htmlspecialchars($cur_topic['subject']) ?></th>
 							</tr>
 							
 							<?php
@@ -690,7 +690,7 @@ INNER JOIN '.$db->prefix.'topics AS t ON tp.topic_id = t.id AND tp.post_alone = 
 							display_header(TRUE);
 							
 							?>
-						<h2 class="block2"><span><?php echo pun_htmlspecialchars($cur_topic['forum_name']) ?>&#160;»&#160;<?php echo pun_htmlspecialchars($cur_topic['subject']) ?></span></h2>
+						<h2 class="block2"><span><?php echo pun_htmlspecialchars($cur_topic['forum_name']) ?>&#160;&raquo;&#160;<?php echo pun_htmlspecialchars($cur_topic['subject']) ?></span></h2>
 						<div class="box">	
 							<p><?php echo $trashed_infos ?></p>
 							
@@ -760,7 +760,7 @@ INNER JOIN '.$db->prefix.'topics AS t ON tp.topic_id = t.id AND tp.post_alone = 
 			<table>
 		
 				<tr>
-					<th><?php echo pun_htmlspecialchars($cur_post['forum_name']) ?>&#160;»&#160;<?php echo pun_htmlspecialchars($cur_post['subject']) ?>&#160;»&#160;<a href='profile.php?id=<?php echo $cur_post['poster_id'] ?>'><?php echo pun_htmlspecialchars($cur_post['poster']).'</a> ('.format_time($cur_post['posted']).')' ?></th>
+					<th><?php echo pun_htmlspecialchars($cur_post['forum_name']) ?>&#160;&raquo;&#160;<?php echo pun_htmlspecialchars($cur_post['subject']) ?>&#160;&raquo;&#160;<a href='profile.php?id=<?php echo $cur_post['poster_id'] ?>'><?php echo pun_htmlspecialchars($cur_post['poster']).'</a> ('.format_time($cur_post['posted']).')' ?></th>
 				</tr>
 				<!--<tr class='pun'>-->
 				<tr>
@@ -787,7 +787,7 @@ INNER JOIN '.$db->prefix.'topics AS t ON tp.topic_id = t.id AND tp.post_alone = 
 			<table>
 		
 				<tr>
-					<th><?php echo pun_htmlspecialchars($cur_post['forum_name']) ?>&#160;»&#160;<?php echo pun_htmlspecialchars($cur_post['subject']) ?>&#160;»&#160;<a href='profile.php?id=<?php echo $cur_post['poster_id'] ?>'><?php echo pun_htmlspecialchars($cur_post['poster']).'</a> ('.format_time($cur_post['posted']).')' ?></th>
+					<th><?php echo pun_htmlspecialchars($cur_post['forum_name']) ?>&#160;&raquo;&#160;<?php echo pun_htmlspecialchars($cur_post['subject']) ?>&#160;&raquo;&#160;<a href='profile.php?id=<?php echo $cur_post['poster_id'] ?>'><?php echo pun_htmlspecialchars($cur_post['poster']).'</a> ('.format_time($cur_post['posted']).')' ?></th>
 				</tr>
 				<!--<tr class='pun'>-->
 				<tr>
@@ -809,7 +809,7 @@ INNER JOIN '.$db->prefix.'topics AS t ON tp.topic_id = t.id AND tp.post_alone = 
 					// Display the admin navigation menu
 					display_header(FALSE);
 					?>
-				<h2 class="block2"><span><?php echo pun_htmlspecialchars($cur_post['forum_name']) ?>&#160;»&#160;<?php echo pun_htmlspecialchars($cur_post['subject']) ?></span></h2>
+				<h2 class="block2"><span><?php echo pun_htmlspecialchars($cur_post['forum_name']) ?>&#160;&raquo;&#160;<?php echo pun_htmlspecialchars($cur_post['subject']) ?></span></h2>
 				<div class="box">	
 					<p><?php echo $trashed_infos ?></p>
 					

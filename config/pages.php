@@ -7,7 +7,7 @@ $pages = array(
 		'file'		=> 'default.php', //the file containing the page in /pages
 		'header'	=> true, //does this page need a header and footer?
 		'permission'=> 0, //what permissions does this page require? (0 for guest, 1 for logged in, 2 for moderator, and 3 for admin
-		'prepend'	=> null //what files need to be put before it? (currently, this means nothing)
+		'prepend'	=> null //what files need to be put before it?
 	),
 
 	'/' => array(
@@ -42,6 +42,13 @@ $pages = array(
 	
 	'/forgot' => array(
 		'file'		=> 'forgot.php',
+		'header'	=> true,
+		'permission'=> 0,
+		'prepend'	=> null
+	),
+	
+	'/forgot-nonscratch' => array(
+		'file'		=> 'forgot-nonscratch.php',
 		'header'	=> true,
 		'permission'=> 0,
 		'prepend'	=> null
@@ -197,8 +204,22 @@ $pages = array(
 		'prepend'	=> null
 	),
 	
+	'/donate' => array(
+		'file'		=> 'donate.php',
+		'header'	=> true,
+		'permission'=> 0,
+		'prepend'	=> null
+	),
+	
 	'/terms' => array(
 		'file'		=> 'terms.php',
+		'header'	=> true,
+		'permission'=> 0,
+		'prepend'	=> null
+	),
+	
+	'/testupload' => array(
+		'file'		=> 'testupload.php',
 		'header'	=> true,
 		'permission'=> 0,
 		'prepend'	=> null
@@ -234,6 +255,14 @@ $pageswithsubdirs = array(
 	
 	'/admin/search_ip' => array(
 		'file'		=> 'admin/search_ip.php',
+		'header'	=> true,
+		'permission'=> 2,
+		'prepend'	=> null
+
+	),
+	
+	'/admin/get_user_ips' => array(
+		'file'		=> 'admin/get_user_ips.php',
 		'header'	=> true,
 		'permission'=> 2,
 		'prepend'	=> null

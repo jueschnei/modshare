@@ -2,7 +2,7 @@
 $page_title = 'Edit ban - Mod Share';
 if (isset($_POST['form_sent'])) {
 	$db->query('UPDATE bans
-	SET ip=\'' . $db->escape($_POST['ip']) . '\',message=\'' . $db->escape($_POST['message']) . '\',expires=' . strtotime($_POST['expire']) . '
+	SET ip=\'' . $db->escape($_POST['ip']) . '\',message=\'' . $db->escape($_POST['message']) . '\',expires=' . strtotime($_POST['expire'] . ' GMT' . ($ms_user['timezone'] >= 0 ? '+' : '') . $ms_user['timezone']) . '
 	WHERE id=' . intval($dirs[3])) or error('Failed to update ban', __FILE__, __LINE__, $db->error());
 }
 if (isset($_POST['remove_ban'])) {

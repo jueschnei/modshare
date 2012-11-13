@@ -12,7 +12,6 @@
 include SRV_ROOT . '/includes/plain_header.php';
 ?>
 
-<?php if (!$ms_user['banned']) { ?>
 <div id="sidebarcontainer">
 <div id="sidebar">
 <?php if ($ms_user['valid']) {
@@ -57,7 +56,6 @@ if (!$ms_user['valid']) { ?>
 </div>
 </div>
 </div>
-<?php } ?>
 
 <?php if ($ms_config['announcement'] != '') { ?>
 <div class="announcement">
@@ -84,5 +82,11 @@ if ($ms_user['valid']) {
 		echo '</a></div>';
 	}
 } ?>
+
+<?php
+if ($_SERVER['HTTP_HOST'] == 'modshare.tk') {
+	echo '<div class="announcement">This site is now located at <a href="http://modshare.org">modshare.org</a>.</div>';
+}
+?>
 
 <div id="mainContent">

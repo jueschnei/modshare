@@ -1,6 +1,6 @@
 <?php
 if ($url == '/logout') {
-	session_destroy();
+	unset($_SESSION['uid']);
 	header('Location: /'); die;
 }
 if (isset($_SESSION['uid'])) {
@@ -19,14 +19,23 @@ if (isset($_POST['un'])) {
 		$user_info = $db->fetch_assoc($result);
 		$_SESSION['uid'] = $user_info['id'];
 		
+		if ($_SESSION['banneduserid'] && $ms_user['id'] != $_SESSION['banneduserid']) {
+			$db->query('INSERT INTO bans(message,user_id,ip,starts,expires)
+			VALUES(\'You have been banned for trying to use an alternate account to get around a ban. Instead of using alternate accounts, please contact us about unbanning the original account.\',' . $user_info['id'] . ',\'' . $_SERVER['REMOTE_ADDR'] . '\',' . (time() + 60 * 20) . ',' . (time() + 60 * 60 * 24 * 3) . ')') or error('Failed to ban alternate account', __FILE__, __LINE__, $db->error());
+			unset($_SESSION['banneduserid']);
+		}
+		
 		addlog('User ' . $user_info['id'] . ' logged in');
 		header('Location: /'); die;
 	} else {
-		$result = $db->query('SELECT id, password_hash FROM users WHERE LOWER(username) = LOWER(\'' . $db->escape($_POST['un']) . '\')');
+		$result = $db->query('SELECT id, password_hash, status FROM users WHERE LOWER(username) = LOWER(\'' . $db->escape($_POST['un']) . '\')');
 		if ($db->num_rows($result)) {
 			$user_info = $db->fetch_assoc($result);
 			if($user_info['password_hash'] == 'reset') {
 				header('Location: /forgot'); die;
+			}
+			if ($user_info['status'] == 'disabledbyadmin') {
+				echo 'Your account has been disabled by the Mod Share Team.'; die;
 			}
 			//bad login, apprise the user of the situation
 			echo '<h2>Invalid login</h2>

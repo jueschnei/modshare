@@ -228,7 +228,7 @@ function poll_form($tid)
 			$fi = $fk;
 ?>
 						<div id="poll_number_<?php echo $k ?>">
-<?php if ($k > 1) echo "\t\t\t\t\t\t\t<br /><hr><br />\n"; ?>
+<?php if ($k > 1) echo "\t\t\t\t\t\t\t<br /><hr /><br />\n"; ?>
 							<label><?php printf($lang_poll['Form question'], $k) ?><br /><input disabled="disabled" id="poll_ques_<?php echo $k ?>" class="longinput" type="text" name="poll_question[<?php echo $k ?>]" value="<?php echo $question ?>" size="80" maxlength="250" /></label>
 							<label><?php echo $lang_poll['Form type'] ?>&nbsp;<input disabled="disabled" type="text" name="poll_type[<?php echo $k ?>]" value="<?php echo ((!isset($type[$k]) || $type[$k]<2) ? '1' : $type[$k]) ?>" size="4" maxlength="2" /></label>
 <?php
@@ -278,7 +278,7 @@ function poll_form($tid)
 		$question = (isset($questions[$k]) && $fk) ? pun_htmlspecialchars($questions[$k]) : '';
 ?>
 						<div id="poll_number_<?php echo $k ?>">
-<?php if ($k > 1) echo "\t\t\t\t\t\t\t<br /><hr><br />\n"; ?>
+<?php if ($k > 1) echo "\t\t\t\t\t\t\t<br /><hr /><br />\n"; ?>
 							<label><?php printf($lang_poll['Form question'], $k) ?><br /><input id="poll_ques_<?php echo $k ?>" class="longinput" type="text" name="poll_question[<?php echo $k ?>]" value="<?php echo $question ?>" tabindex="<?php echo $cur_index++ ?>" size="80" maxlength="250" onkeyup="ForQues(<?php echo $k ?>)" /></label>
 							<label><?php echo $lang_poll['Form type'] ?>&nbsp;<input type="text" name="poll_type[<?php echo $k ?>]" value="<?php echo ((!isset($type[$k]) || $type[$k]<2) ? '1' : $type[$k]) ?>" tabindex="<?php echo $cur_index++ ?>" size="4" maxlength="2" /></label>
 <?php

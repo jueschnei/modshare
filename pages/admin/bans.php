@@ -12,7 +12,7 @@ LEFT JOIN users AS u ON u.id=b.user_id') or error('Failed to check bans', __FILE
 <table border="0">
 	<tr>
 		<th>Username</th>
-		<th>IP addresses</th>
+		<th style="max-width: 300px;">IP addresses</th>
 		<th>Expires</th>
 		<th>Message</th>
 		<th>Edit</th>
@@ -21,7 +21,14 @@ LEFT JOIN users AS u ON u.id=b.user_id') or error('Failed to check bans', __FILE
 	while ($cur_ban = $db->fetch_assoc($result)) {
 		echo '<tr>
 		<td>' . clearHTML($cur_ban['username']) . '</td>
-		<td>' . $cur_ban['ip'] . '</td>
+		<td>';
+		$iplist = explode(',', $cur_ban['ip']);
+		if (sizeOf($iplist) > 5) {
+			$iplist = array_slice($iplist, 0, 10);
+			$iplist[] = '<div style="text-align:center">...</div>';
+		}
+		echo implode($iplist, '<br />');
+		echo '</td>
 		<td>' . format_date($cur_ban['expires'], true) . '</td>
 		<td>' . clearHTML($cur_ban['message']) . '</td>
 		<td><a href="/admin/edit_ban/' . $cur_ban['id'] . '">Edit</a></td>

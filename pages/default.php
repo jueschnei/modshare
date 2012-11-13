@@ -10,7 +10,7 @@ LEFT JOIN users AS u
 ON u.id=p.uploaded_by
 WHERE p.status=\'normal\'
 ORDER BY p.time DESC
-LIMIT 0,3') or error('Failed to get latest projects', __FILE__, __LINE__, $db->error());
+LIMIT 3') or error('Failed to get latest projects', __FILE__, __LINE__, $db->error());
 if ($db->num_rows($result)) {
 ?>
 <h2>Latest projects</h2>

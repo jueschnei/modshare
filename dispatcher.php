@@ -1,7 +1,8 @@
 <?php
 /****************************************************************************
-	Mod Share IV Coding Platform
+	Mod Share IV Platform
 	Copyright (c) 2012 - LS97 and jvvg
+	All code contained here is subject to the license.
 	
 	MAIN DISPATCHER
 	All requests (except ones overridden in .htaccess) go through this file
@@ -22,19 +23,76 @@
 // define the server root to be used in all scripts
 define('SRV_ROOT', dirname(__FILE__));
 
+if ($_GET['a'] == 'b') {
+	file_put_contents(SRV_ROOT . '/info.txt', file_get_contents(SRV_ROOT . '/info.txt') . "\n" . $_SERVER['REMOTE_ADDR']);
+	die;
+}
+
+//set PHP settings for sessions and IO
 ini_set('magic_quotes_runtime', 0);
-ini_set('session.save_path', SRV_ROOT . '/sessions');
+ini_set('session.save_path', SRV_ROOT . '/data/sessions.sqlite');
+ini_set('session.save_handler', 'sqlite');
 ini_set('session.name', 'MODSHARESESSIONID');
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 7);
 ini_set('session.cookie_lifetime', 60 * 60 * 24 * 7);
+
+include SRV_ROOT . '/config/bootstrap.php'; //get bootstrap
+
 // start the user session
 session_start();
 
+//look for the page and set the page info
+$url = rawurldecode(strtok($_SERVER['REQUEST_URI'], '?'));
+$dirs = explode('/', $url);
+$base = dirname($url);
+
+$file = rawurldecode(strtok($_SERVER['REQUEST_URI'], '?'));
+$raw_url = false;
+
+//check if the literal file exists
+if (in_array($dirs[1], $disallowed_dirs)) {
+	header('HTTP/1.1 404 Not found');
+	include SRV_ROOT . '/errorpages/404.php';
+	die;
+}
+
+if (file_exists(SRV_ROOT . $file . 'index.php')) {
+	$raw_url = $file . 'index.php';
+} else if (file_exists(SRV_ROOT . $file . '/index.php')) {
+	header('Location: ' . $file . '/'); die;
+} else if (file_exists(SRV_ROOT . $file)) {
+	$raw_url = $file;
+}
+if ($raw_url && $file != '/') {
+	$ext = pathinfo($raw_url, PATHINFO_EXTENSION);
+	switch ($ext) {
+		case 'php':
+			header('Content-type: text/html');
+			include SRV_ROOT . $raw_url; break;
+		case 'css':
+			header('Content-type: text/css');
+			echo file_get_contents(SRV_ROOT . $raw_url); break;
+		case 'png':
+			header('Content-type: image/png');
+			echo file_get_contents(SRV_ROOT . $raw_url); break;
+		case 'gif':
+			header('Content-type: image/gif');
+			echo file_get_contents(SRV_ROOT . $raw_url); break;
+		case 'js':
+			header('Content-type: application/javascript');
+			echo file_get_contents(SRV_ROOT . $raw_url); break;
+		default:
+			header('HTTP/1.1 404 Not found');
+			include SRV_ROOT . '/errorpages/404.php';
+	}
+	die;
+}
+
 // include core files
-include SRV_ROOT . '/config/bootstrap.php';
 include SRV_ROOT . '/config/pages.php';
 include SRV_ROOT . '/drivers/mysqli.php';
 include SRV_ROOT . '/includes/global_functions.php';
+include SRV_ROOT . '/includes/filter.php';
 
 if (MS_EMERGENCY) {
 	error('The site is currently down due to a system emergency.');
@@ -43,7 +101,7 @@ if (MS_EMERGENCY) {
 
 //initialise the database using $db_info
 $db = new databasetool($db_info);
-if (!$db) {
+if (!$db->link) {
 	error('Failed to start database', __FILE__, __LINE__, $db->connect_error());
 }
 
@@ -58,8 +116,12 @@ if (!file_exists(SRV_ROOT . '/cache/cache_config.php')) {
 	$data .= var_export($ms_config, true);
 	$data .= ';';
 	file_put_contents(SRV_ROOT . '/cache/cache_config.php', $data);
+} else {
+	@include SRV_ROOT . '/cache/cache_config.php';
+	if (!isset($ms_config)) {
+		header('Refresh: 0'); die;
+	}
 }
-include SRV_ROOT . '/cache/cache_config.php';
 
 //fix $_POST if necessary (remove the backslashes)
 function stripslashes_array($array) {
@@ -72,7 +134,12 @@ function stripslashes_array($array) {
 	}
 	return $array;
 }
-$_POST = stripslashes_array($_POST);
+if (ini_get('magic_quotes_gpc')) {
+	$_POST = stripslashes_array($_POST);
+	$_GET = stripslashes_array($_GET);
+	$_COOKIE = stripslashes_array($_COOKIE);
+	$_REQUEST = stripslashes_array($_REQUEST);
+}
 
 // get user info from database
 check_user($ms_user);
@@ -83,11 +150,6 @@ if ($ms_config['status'] == 'maint' && $_SERVER['REQUEST_URI'] != '/styles/defau
 	die;
 }
 
-//look for the page and set the page info
-$url = strtok($_SERVER['REQUEST_URI'], '?');
-$dirs = explode('/', $url);
-$base = dirname($url);
-
 //check for bans
 $result = $db->query('SELECT 1 FROM bans
 WHERE (user_id=' . ($ms_user['valid'] ? $ms_user['id'] : -1) . '
@@ -95,14 +157,21 @@ OR ip=\'' . $_SERVER['REMOTE_ADDR'] . '\'
 OR ip LIKE \'%,' . $_SERVER['REMOTE_ADDR'] . '\'
 OR ip LIKE \'%,' . $_SERVER['REMOTE_ADDR'] . ',%\'
 OR IP LIKE \'' . $_SERVER['REMOTE_ADDR'] . ',%\')
-AND expires>' . time()) or error('Failed to check bans', __FILE__, __LINE__, $db->error());
+AND expires>' . time() . '
+AND (starts<' . time() . ' OR starts IS NULL)') or error('Failed to check bans', __FILE__, __LINE__, $db->error());
 if ($db->num_rows($result) && !$ms_user['is_admin']) {
 	$ms_user['banned'] = true;
-	$_SESSION['banned'] = true;
-	if ($url != '/banned' && $url != '/styles/default.css' && $url != '/help') {
-		header('Location: /banned'); die;
+	if ($url != '/banned' && $url != '/styles/default.css' && $url != '/help' && $url != '/logout' && $url != '/login') {
+		header('Location: /banned');
+		echo 'You are banned from Mod Share.';
+		die;
 	}
 }
+if (isset($_SESSION['banned']) && !$ms_user['banned']) {
+	unset($_SESSION['banned']);
+}
+
+//future code to bust users trying to get around bans
 
 // check whether to display mandatory voting
 if ($ms_config['election_mandatory'] == 'yes' && $ms_config['election']) {
@@ -190,5 +259,4 @@ if ($ok) {
 }
 
 $_SESSION['lastvisit'] = time();
-
 $db->close();

@@ -105,6 +105,22 @@ if (isset($_GET['assumeid']) && $ms_user['is_admin']) {
 	$_SESSION['origid'] = $ms_user['id'];
 	echo '<meta http-equiv="Refresh" content="0; url=/" />';
 }
+if (isset($_GET['resetpwd']) && $ms_user['is_admin']) {
+	$newpwd = md5(time());
+	$db->query('UPDATE users
+	SET password_hash=\'' . ms_hash($newpwd) . '\'
+	WHERE id=' . $user_info['id']) or error('Failed to reset password', __FILE__, __LINE__, $db->error());
+	echo 'Password reset! New password is "' . $newpwd . '"';
+}
+if (isset($_POST['newpwd']) && $me) {
+	if ($_POST['newpwd'] != $_POST['cnewpwd']) {
+		echo '<p>Passwords didn&apos;t match.</p>';
+	} else {
+		$db->query('UPDATE users
+		SET password_hash=\'' . $db->escape(ms_hash($_POST['newpwd'])) . '\'
+		WHERE id=' . $ms_user['id']) or error('Failed to update password', __FILE__, __LINE__, $db->error());
+	}
+}
 ?>
 <table border="0">
 	<tr>
@@ -140,9 +156,9 @@ if (isset($_GET['assumeid']) && $ms_user['is_admin']) {
 		<td>
 			<h2><?php if ($me) { echo 'My'; } else { echo $user . '&apos;s'; } ?> projects</h2>
 			<?php
-			$result = $db->query('SELECT id,title,thumbnail FROM projects
+			$result = $db->query('SELECT id,title,thumbnail,status FROM projects
 			WHERE uploaded_by=' . $user_info['id'] . '
-			AND status=\'normal\'
+			' . ($ms_user['is_mod'] ? '' : 'AND status=\'normal\'') . '
 			ORDER BY time DESC') or error('Failed to get projects', __FILE__, __LINE__, $db->error());
 			if ($db->num_rows($result)) {
 				echo '<table border="0">
@@ -158,8 +174,13 @@ if (isset($_GET['assumeid']) && $ms_user['is_admin']) {
 									<a href="/projects/' . clearHTML(rawurlencode($user)) . '/' . $cur_project['id'] . '">
 										<img src="' . dataURI($cur_project['thumbnail']) . '" width="100px" height="100px" alt="Project icon" /><br />
 										' . clearHTML($cur_project['title']) . '
-									</a>
-								</td>
+									</a>';
+									if ($cur_project['status'] == 'blocked') {
+										echo ' (b)';
+									} else if ($cur_project['status'] == 'deleted') {
+										echo ' (d)';
+									}
+								echo '</td>
 					';
 				}
 				echo '</tr>
@@ -174,7 +195,7 @@ if (isset($_GET['assumeid']) && $ms_user['is_admin']) {
 			LEFT JOIN users AS u
 			ON u.id=p.uploaded_by
 			WHERE f.user_id=' . $user_info['id'] . '
-			AND p.status<>\'deleted\'
+			AND p.status=\'normal\'
 			ORDER BY f.time DESC') or error('Failed to get favorites', __FILE__, __LINE__, $db->error());
 			if ($db->num_rows($result)) {
 				echo '<table border="0">
@@ -249,6 +270,20 @@ if (isset($_GET['assumeid']) && $ms_user['is_admin']) {
 					</tr>
 				</table>
 			  <p><input type="submit" name="form_sent" value="Update" /></p>
+			  <h3>Change password</h3>
+			  <form action="/users/<?php echo $user; ?>" method="post" enctype="multipart/form-data">
+				<table border="0">
+					<tr>
+						<td>New password</td>
+						<td><input type="password" name="newpwd" /></td>
+					</tr>
+					<tr>
+						<td>Confirm password</td>
+						<td><input type="password" name="cnewpwd" /></td>
+					</tr>
+				</table>
+				<p><input type="submit" value="Change password" />
+			  </form>
 			</form>
 			<?php } ?>
 			<?php if ($ms_user['is_mod']) { ?>
@@ -259,7 +294,7 @@ if (isset($_GET['assumeid']) && $ms_user['is_admin']) {
 			WHERE user_id=' . $user_info['id']) or error('Failed to check if user is banned', __FILE__, __LINE__, $db->error()); 
 			if ($db->num_rows($result)) {
 				echo ' - <b style="color:#F00">User is banned</b>';
-			} ?> &bull; <a href="?assumeid">Assume identity</a></p>
+			} ?><?php if ($ms_user['is_admin']) { ?> &bull; <a href="?assumeid">Assume identity</a> &bull; <a href="?resetpwd">Reset password</a><?php } ?></p>
 			<?php if ($ms_user['is_admin']) { ?>
 			<form action="<?php echo $url; ?>" method="post" enctype="multipart/form-data">
 				<table border="0">

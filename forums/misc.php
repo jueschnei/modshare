@@ -249,7 +249,7 @@ else if (isset($_GET['report']))
 				if ($num_reports >= TOO_MANY_REPORTS) {
 					$db->query('INSERT INTO ' . $db->prefix . 'bans(username,ip,message,expire,ban_creator)
 					VALUES(\'' . $db->escape($poster) . '\',\'' . $poster_ip . '\',\'You have been auto-banned because one of your posts has been reported several times. The Mod Share Team will check it out and unban you if it was OK.\',' . ($now + 60 * 60 * 24) . ',0)') or error('Failed to autoban user', __FILE__, __LINE__, $db->error());
-					$reason .= "\n" . 'Warning: user has been auto-banned and post has been hidden';
+					$reason .= "\n" . 'Warning: user has been auto-banned and post has been hidden. Zapping this report will re-show the post but WILL NOT UN-BAN THE POSTER.';
 					unlink(FORUM_CACHE_DIR . 'cache_bans.php');
 				}
 			}

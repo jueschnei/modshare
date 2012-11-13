@@ -20,14 +20,9 @@ $db_info = array( //database info
 
 So, set all of the necessary options to connect to your database.
 
-2. Import all of the following database files:
-config/database/db_structure.sql
-config/database/db_data.sql
+2. Run the provided database config file to set up the database (should be database.sql or something like that)
 
 3. Everything should work. The following parts are just extra information.
-
-4. When you're done, please contact us to tell us what you plan to do with it. We'd love to hear from you.
-Also, if you ever plan on making it public, you must remove every mention of the term "Mod Share" and all of the logos.
 
 ----- MAKE YOURSELF AN ADMIN -----
 After your creating your account, run the following query on the database:

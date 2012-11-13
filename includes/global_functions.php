@@ -2,38 +2,41 @@
 // output an error page with the selected error
 if (!$forums) {
 	function error($error, $file = '', $line = '', $db_error = '') {
+		global $ms_user;
+		
 		header('Content-type: text/html; charset=utf-8');
 		ob_end_clean();
 		?>
-		<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-		<html xmlns="http://www.w3.org/1999/xhtml">
-		<head>
-			<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-			<title>Error - Mod Share</title>
-		</head>
-		<body>
-		<p>An error was encountered: <?php echo $error; ?></p>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<title>Error - Mod Share</title>
+</head>
+<body>
+<p>An error was encountered: <?php echo $error; ?></p>
+<?php
+if (defined('MS_DEBUG')) {
+	if ($file != '' && $line != '') {
+		echo '<p>In file <b>' . str_replace(SRV_ROOT, '[ROOT]', $file) . '</b> on line <b>' . $line . '</b></p>';
+	}
+	if ($db_error != '') {
+		echo 'The database reported: <b>' . $db_error . '</b>';
+	}
+}
+?>
+</body>
+</html>
 		<?php
-		if (defined('MS_DEBUG')) {
-			if ($file != '' && $line != '') {
-				echo '<p>In file <b>' . substr($file, 16) . '</b> on line <b>' . $line . '</b></p>';
-			}
-			if ($db_error != '') {
-				echo 'The database reported: <b>' . $db_error . '</b>';
-			}
-		}
-		?>
-		</body>
-		</html>
-		<?php
-		addlog('Error ' . $error);
+		addlog('Error ' . $error . ' in file "' . str_replace(SRV_ROOT, '[ROOT]', $file) . '" on line ' . $line);
 		die;
 	}
 }
 
 // hash the passwords
 function ms_hash($text) {
-	return sha1('salt' . $text . 'salt');
+	global $hash_salt;
+	return crypt($text, $hash_salt);
 }
 
 /* return user info
@@ -85,29 +88,21 @@ function user_is_guest(&$ms_user) {
 }
 
 // replace html with other characters
-function clearHTML($text, $linebreaks = false) {
+function clearHTML($text, $linebreaks = false, $censor = true) {
 	global $ms_user;
 	$text = str_replace('&', '&amp;', $text);
 	$text = str_replace('<', '&lt;', $text);
 	$text = str_replace('>', '&gt;', $text);
+	
 	if ($linebreaks) {
-		$text = str_replace("\n", '<br />', $text);
+		$text = str_replace("\r\n", "\n", $text);
+		$text = str_replace("\r", "\n", $text);
+		$pattern = array("\n", "\t", '  ', '  ');
+		$replace = array('<br />', '&#160; &#160; ', '&#160; ', ' &#160;');
+		$text = str_replace($pattern, $replace, $text);
 	}
-	$text = censor($text);
-	return $text;
-}
-
-function censor($text) {
-	global $ms_user;
-	$pattern = array('damn*', '*fuck*', '*shit*', 'crap*', 'rape', 'rapist', 'raper', 'cunt*', 'ass', 'asshole', '*cialis*', '*viagra*');
-	$text = ' ' . $text . ' ';
-	foreach ($pattern as &$val) {
-		$val = '%(?<=[^\p{L}\p{N}])('.str_replace('\*', '[\p{L}\p{N}]*?', preg_quote($val, '%')).')(?=[^\p{L}\p{N}])%iu';
-	}
-	$text = preg_replace($pattern, '[censored]', $text);
-	$text = substr($text, 1, strlen($text) - 2);
-	if (strstr($text, '[censored]')) {
-		addlog('Bad word in comment "' . $text . '"');
+	if ($censor) {
+		$text = censor($text);
 	}
 	return $text;
 }
@@ -123,9 +118,13 @@ function add_smilies($text) {
 }
 
 // return html for the user page
-function parse_username($uinfo) {
+function parse_username($uinfo, $full_url = false) {
 	//give me an array with the elements username and permission
-	$out = '<a href="/users/' . clearHTML(rawurlencode($uinfo['username'])) . '">' . clearHTML($uinfo['username']) . '</a>';
+	$out = '<a href="';
+	if ($full_url) {
+		$out .= 'http://' . $_SERVER['HTTP_HOST'];
+	}
+	$out .= '/users/' . clearHTML(rawurlencode($uinfo['username'])) . '">' . clearHTML($uinfo['username']) . '</a>';
 	if ($uinfo['permission'] == 2) {
 		$out .= ' <sup style="color:#0F0; font-weight:bold; cursor:pointer" onclick="alert(\'This user is a moderator.\');">M</sup>';
 	} elseif ($uinfo['permission'] == 3) {
