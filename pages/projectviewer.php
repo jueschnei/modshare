@@ -75,7 +75,7 @@ while($currlove = $db->fetch_assoc($lovequery)) {
 function comments() {
 	//display the comments, this one is a doozy
 	global $db, $dirs, $project_info, $ms_user;
-	$result = $db->query('SELECT c.id,c.parent,c.content,c.ip_addr,u.username,c.posted,u.permission FROM comments AS c
+	$result = $db->query('SELECT c.id,c.parent,c.content,c.ip_addr,u.username,c.posted,u.permission,u.id AS uid FROM comments AS c
 	LEFT JOIN users AS u
 	ON u.id=c.author
 	WHERE project=' . intval($dirs[3]) . '
@@ -83,15 +83,15 @@ function comments() {
 	$comments = array();
 	while ($cur_comment = $db->fetch_assoc($result)) {
 		if ($cur_comment['parent'] == null) { //put the comments into arrays, based on thier parent comment
-			$comments[$cur_comment['id']][0] = array('content' => $cur_comment['content'], 'username' => $cur_comment['username'], 'permission' => $cur_comment['permission'], 'time' => $cur_comment['posted'], 'ip' => $cur_comment['ip_addr']);
+			$comments[$cur_comment['id']][0] = array('content' => $cur_comment['content'], 'username' => $cur_comment['username'], 'permission' => $cur_comment['permission'], 'time' => $cur_comment['posted'], 'ip' => $cur_comment['ip_addr'], 'uid' => $cur_comment['uid']);
 		} else {
-			$comments[$cur_comment['parent']][$cur_comment['id']] = array('content' => $cur_comment['content'], 'username' => $cur_comment['username'], 'permission' => $cur_comment['permission'], 'time' => $cur_comment['posted'], 'ip' => $cur_comment['ip_addr']);
+			$comments[$cur_comment['parent']][$cur_comment['id']] = array('content' => $cur_comment['content'], 'username' => $cur_comment['username'], 'permission' => $cur_comment['permission'], 'time' => $cur_comment['posted'], 'ip' => $cur_comment['ip_addr'], 'uid' => $cur_comment['uid']);
 		}
 	}
 	//process the comments for output
 	foreach ($comments as $key => $val) {
 		$timedelta = $ms_user['timezone'] * 3600;
-		echo '<hr /><h4>' . parse_username($val[0]) . ' - ' . gmdate('d M Y H:i:s', $val[0]['time'] + $timedelta) . '</h4>';
+		echo '<hr /><h4 id="comment_' . $key . '_heading"><img src="/data/icons/user/' . $val[0]['uid'] . '.png" width="32px" height="32px" />' . parse_username($val[0]) . ' - ' . gmdate('d M Y H:i:s', $val[0]['time'] + $timedelta) . '</h4>';
 		echo '<p>' . clearHTML($val[0]['content']) . '</p>';
 		if ($ms_user['valid']) {
 			echo '<p id="cd' . $key . '"><a style="cursor:pointer" onclick="replyToComment(' . $key . ')">Reply</a> &bull; <a style="cursor:pointer" onclick="flagComment(' . $key . ')">Flag as inappropriate</a>';
@@ -106,7 +106,7 @@ function comments() {
 		$out = array(); //for ordering
 		foreach ($val as $subkey => $subval) {
 			if ($subkey != 0) {
-				$outval = '<h5 style="margin-left: 15px; font-size:16px;">' . parse_username($subval) . ' - ' . gmdate('d M Y H:i:s', $subval['time'] + $timedelta) . '</h5><p style="margin-left: 15px">' . clearHTML($subval['content']) . '</p>';
+				$outval = '<h5 style="margin-left: 15px; font-size:16px;" id="comment_' . $subkey . '_heading"><img src="/data/icons/user/' . $subval['uid'] . '.png" width="32px" height="32px" />' . parse_username($subval) . ' - ' . gmdate('d M Y H:i:s', $subval['time'] + $timedelta) . '</h5><p style="margin-left: 15px">' . clearHTML($subval['content']) . '</p>';
 				$outval .= '<p style="margin-left: 15px">';
 				if ($ms_user['is_mod'] || ($ms_user['id'] == $project_info['uploaded_by'] && $subval['permission'] < 2)) {
 					$outval .= '<a onclick="deleteComment(' . $subkey . ')" style="cursor:pointer">Delete</a>';
@@ -126,6 +126,13 @@ function comments() {
 	}
 }
 
+if (isset($_GET['allow']) && $ms_user['is_mod']) {
+	//if a mod decides a project is ok, re-allow it
+	$db->query('UPDATE projects
+	SET status=\'normal\'
+	WHERE id=' . intval($dirs[3])) or error('Failed to re-show project', __FILE__, __LINE__, $db->error());
+}
+
 //download project
 if ($dirs[4] == 'download') {
 	ob_end_clean();
@@ -142,24 +149,28 @@ if ($dirs[4] == 'download') {
 //love project
 if ($dirs[4] == 'love') {
 	ob_end_clean();
-	$result = $db->query('SELECT 1 FROM loves
-	WHERE user=' . ($ms_user['valid'] ? $ms_user['id'] : 0) . '
-	AND project=' . intval($dirs[3])) or error('Failed to check if project is loved already', __FILE__, __LINE__, $db->error());
-	if ($db->num_rows($result)) {
-		$db->query('DELETE FROM loves
-		WHERE user=' . $ms_user['id'] . '
-		AND project=' . intval($dirs[3])) or error('Failed to remove from loves', __FILE__, __LINE__, $db->error());
-		echo '<a onclick="loveProject(this.parentNode);"><img src="/img/love.png" alt="loves" title="love" height="32" width="32" style="cursor: pointer;" /></a><br />' . ($project_info['loves'] - 1);
+	if ($ms_user['valid']) {
+		$result = $db->query('SELECT 1 FROM loves
+		WHERE user=' . ($ms_user['valid'] ? $ms_user['id'] : 0) . '
+		AND project=' . intval($dirs[3])) or error('Failed to check if project is loved already', __FILE__, __LINE__, $db->error());
+		if ($db->num_rows($result)) {
+			$db->query('DELETE FROM loves
+			WHERE user=' . $ms_user['id'] . '
+			AND project=' . intval($dirs[3])) or error('Failed to remove from loves', __FILE__, __LINE__, $db->error());
+			echo '<a onclick="loveProject(this.parentNode);"><img src="/img/love.png" alt="loves" title="love" height="32" width="32" style="cursor: pointer;" /></a><br />' . ($project_info['loves'] - 1);
+		} else {
+			$db->query('INSERT INTO loves(user,project)
+			VALUES(' . $ms_user['id'] . ',' . intval($dirs[3]) . ')') or error('INSERT INTO loves(user,project)
+			VALUES(' . $ms_user['id'] . ',' . intval($dirs[3]) . ')', __FILE__, __LINE__, $db->error());
+			echo '<a onclick="loveProject(this.parentNode);"><img src="/img/loveyes.png" alt="loves" title="unlove" height="32" width="32" style="cursor: pointer;" /></a><br />' . ($project_info['loves'] + 1);
+		}
 	} else {
-		$db->query('INSERT INTO loves(user,project)
-		VALUES(' . $ms_user['id'] . ',' . intval($dirs[3]) . ')') or error('INSERT INTO loves(user,project)
-		VALUES(' . $ms_user['id'] . ',' . intval($dirs[3]) . ')', __FILE__, __LINE__, $db->error());
-		echo '<a onclick="loveProject(this.parentNode);"><img src="/img/loveyes.png" alt="loves" title="unlove" height="32" width="32" style="cursor: pointer;" /></a><br />' . ($project_info['loves'] + 1);
+		echo 'You need to be logged in to love stuff.';
 	}
 	die;
 }
 //feature project
-if ($dirs[4] == 'feature') {
+if ($dirs[4] == 'feature' && $ms_user['is_mod']) {
 	ob_end_clean();
 	$db->query('UPDATE projects
 	SET featured=' . time() . '
@@ -167,11 +178,28 @@ if ($dirs[4] == 'feature') {
 	header('Location: /projects/' . $dirs[2] . '/' . $dirs[3]);
 	die;
 }
+//feature project on user's page
+if ($dirs[4] == 'featureonuserpage' && ($ms_user['is_mod'] || $ms_user['username'] == $dirs[2])) {
+	ob_end_clean();
+	$db->query('UPDATE users
+	SET featured_project=' . intval($dirs[3]) . '
+	WHERE username=\'' . $dirs[2] . '\'') or error('Failed to feature project', __FILE__, __LINE__, $db->error());
+	header('Location: /users/' . $dirs[2]);
+	die;
+}
 //all of this AJAX fun
 if (isset($_POST['reason']) && $ms_user['valid']) {
 	//flag project
 	$db->query('INSERT INTO flags(project_id,flagged_by,time_flagged,reason)
 	VALUES(' . intval($dirs[3]) . ',' . $ms_user['id'] . ',' . time() . ',\'' . $db->escape($_POST['reason']) . '\')') or error('Failed to flag project', __FILE__, __LINE__, $db->error()); //flag project
+	$result = $db->query('SELECT 1 FROM flags
+	WHERE project_id=' . intval($dirs[3]) . '
+	AND zapped IS NULL') or error('Failed to check for previous flags', __FILE__, __LINE__, $db->error());
+	if ($db->num_rows($result) >= 3) {
+		$db->query('UPDATE projects
+		SET status=\'toomanyreports\'
+		WHERE id=' . intval($dirs[3])) or error('Failed to autoban', __FILE__, __LINE__, $db->error());
+	}
 	header('Location: /'); die;
 }
 
@@ -235,6 +263,17 @@ if (isset($_POST['settitle'])) {
 	SET title=\'' . $db->escape($_POST['settitle']) . '\'
 	WHERE id=' . intval($dirs[3]) . '
 	' . ($ms_user['is_mod'] ? '' : 'AND uploaded_by=' . $ms_user['id'])) or error('Failed to update title', __FILE__, __LINE__, $db->error());
+	
+	//rebuild search index for this project
+	$db->query('DELETE FROM search_index WHERE project=' . intval($dirs[3])) or error('Failed to delete existing search entries', __FILE__, __LINE__, $db->error());
+	$words = array_merge(split_into_words($_POST['settitle']), split_into_words($project_info['description']));
+	$entries = array();
+	foreach ($words as $val) {
+		$entries[] = '(' . intval($dirs[3]) . ',\'' . $db->escape($val) . '\')';
+	}
+	$db->query('INSERT INTO search_index(project,word)
+	VALUES' . implode(',', $entries)) or error('Failed to update search index', __FILE__, __LINE__, $db->error());
+	
 	echo clearHTML($_POST['settitle']); die;
 }
 if (isset($_POST['setdesc'])) {
@@ -247,6 +286,17 @@ if (isset($_POST['setdesc'])) {
 	SET description=\'' . $db->escape($_POST['setdesc']) . '\'
 	WHERE id=' . intval($dirs[3]) . '
 	' . ($ms_user['is_mod'] ? '' : 'AND uploaded_by=' . $ms_user['id'])) or error('Failed to update description', __FILE__, __LINE__, $db->error());
+	
+	//rebuild search index for this project
+	$db->query('DELETE FROM search_index WHERE project=' . intval($dirs[3])) or error('Failed to delete existing search entries', __FILE__, __LINE__, $db->error());
+	$words = array_merge(split_into_words($_POST['setdesc']), split_into_words($project_info['title']));
+	$entries = array();
+	foreach ($words as $val) {
+		$entries[] = '(' . intval($dirs[3]) . ',\'' . $db->escape($val) . '\')';
+	}
+	$db->query('INSERT INTO search_index(project,word)
+	VALUES' . implode(',', $entries)) or error('Failed to update search index', __FILE__, __LINE__, $db->error());
+	
 	echo clearHTML($_POST['setdesc'], true); die;
 }
 if (isset($_POST['origid'])) {
@@ -255,15 +305,43 @@ if (isset($_POST['origid'])) {
 	if (containsBadWords($_POST['comment'])) {
 		echo 'Please do not use inappropriate words on Mod Share.'; die;
 	}
+	if ($ms_user['last_comment'] > time() - $ms_config['comment_flood']) {
+		header('HTTP/1.1 400 Bad request');
+		echo '[failed][reason=commentflood]';
+		die;
+	}
 	$db->query('INSERT INTO comments(project,posted,author,content,parent,ip_addr)
 	VALUES(' . intval($dirs[3]) . ',' . time() . ',' . $ms_user['id'] . ',\'' . $db->escape($_POST['comment']) . '\',' . intval($_POST['origid']) . ',\'' . $_SERVER['REMOTE_ADDR'] . '\')') or error('Failed to submit comment', __FILE__, __LINE__, $db->error());
-	$result = $db->query('SELECT author FROM comments
-	WHERE id=' . intval($_POST['origid'])) or error('Failed to get original author', __FILE__, __LINE__, $db->error());
-	$originfo = $db->fetch_assoc($result);
-	if ($originfo['author'] != $ms_user['id']) {
-		$db->query('INSERT INTO notifications(user,type,message)
-		VALUES(' . $originfo['author'] . ',0,\'' . $db->escape('Your comment on the project <a href="/projects/' . $project_info['author'] . '/' . intval($dirs[3]) . '">' . clearHTML($project_info['title']) . '</a> has been replied to by ' . parse_username($ms_user)) . '\')') or error('Failed to create notification', __FILE__, __LINE__, $db->error());
+	$comment_id = $db->insert_id();
+	//get anybody who has commented on the project
+	$result = $db->query('SELECT distinct(author) FROM comments
+	WHERE id=' . intval($_POST['origid']) . ' OR parent=' . intval($_POST['origid'])) or error('Failed to get list of people to notify', __FILE__, __LINE__, $db->error());
+	$people = array();
+	while (list($author) = $db->fetch_row($result)) {
+		$people[] = $author;
 	}
+	
+	$notified = array();
+	if ($project_info['uploaded_by'] != $ms_user['id']) {
+		$insert_data = array('(' . $project_info['uploaded_by'] . ',0,\'' . $db->escape('Your project <a href="/projects/' . $project_info['author'] . '/' . intval($dirs[3]) . '">' . clearHTML($project_info['title']) . '</a> has received a new comment by ' . parse_username($ms_user)) . '\')');
+		$notified[] = $project_info['uploaded_by'];
+	} else {
+		$insert_data = array();
+	}
+	
+	foreach ($people as $val) {
+		if ($val != $ms_user['id'] && !in_array($val, $notified)) {
+			$insert_data[] = '(' . $val . ',0,\'' . $db->escape('Your comment on the project <a href="/projects/' . $project_info['author'] . '/' . intval($dirs[3]) . '#comment_' . $comment_id . '_heading">' . clearHTML($project_info['title']) . '</a> has been replied to by ' . parse_username($ms_user)) . '\')';
+			$notified[] = $val;
+		}
+	}
+	if (sizeof($insert_data) > 0) {
+		$db->query('INSERT INTO notifications(user,type,message) VALUES' . implode(',', $insert_data)) or error('Failed to notify followers', __FILE__, __LINE__, $db->error());
+	}
+	
+	//set user last comment
+	$db->query('UPDATE users SET last_comment=' . time() . ' WHERE id=' . $ms_user['id']) or error('Failed to update user', __FILE__, __LINE__, $db->error());
+	
 	comments();
 	die;
 }
@@ -273,18 +351,45 @@ if (isset($_POST['comment'])) {
 		ob_end_clean();
 		echo 'Please do not use inappropriate words on Mod Share.'; die;
 	}
+	if ($ms_user['last_comment'] > time() - $ms_config['comment_flood']) {
+		ob_end_clean();
+		header('HTTP/1.1 400 Bad request');
+		echo '[failed][reason=commentflood]';
+		die;
+	}
 	$db->query('INSERT INTO comments(project,posted,author,content,ip_addr)
 	VALUES(' . intval($dirs[3]) . ',' . time() . ',' . $ms_user['id'] . ',\'' . $db->escape($_POST['comment']) . '\',\'' . $_SERVER['REMOTE_ADDR'] . '\')') or error('Failed to submit comment', __FILE__, __LINE__, $db->error());
+	$comment_id = $db->insert_id();
 	//notify project owner
 	if ($ms_user['id'] != $project_info['uploaded_by']) {
 		$db->query('INSERT INTO notifications(user,type,message)
-		VALUES(' . $project_info['uploaded_by'] . ',0,\'' . $db->escape('Your project <a href="/projects/' . $project_info['author'] . '/' . intval($dirs[3]) . '">' . clearHTML($project_info['title']) . '</a> has received a new comment by ' . parse_username($ms_user)) . '\')') or error('Failed to create notification', __FILE__, __LINE__, $db->error());
+		VALUES(' . $project_info['uploaded_by'] . ',0,\'' . $db->escape('Your project <a href="/projects/' . $project_info['author'] . '/' . intval($dirs[3]) . '#comment_' . $comment_id . '_heading">' . clearHTML($project_info['title']) . '</a> has received a new comment by ' . parse_username($ms_user)) . '\')') or error('Failed to create notification', __FILE__, __LINE__, $db->error());
 	}
+	//set user last comment
+	$db->query('UPDATE users SET last_comment=' . time() . ' WHERE id=' . $ms_user['id']) or error('Failed to update user', __FILE__, __LINE__, $db->error());
+	
 	if (!isset($_POST['noajax'])) {
 		ob_end_clean();
 		comments();
 		die;
 	}
+}
+if (isset($_POST['gallery_form_sent'])) {
+	$add = array();
+	foreach ($_POST['galleries'] as $val) {
+		$add[] = '(' . intval($val) . ',' . $project_info['id'] . ',' . time() . ')';
+	}
+	$db->query('INSERT INTO gallery_projects(gallery_id,project_id,added) VALUES' . implode(',', $add)) or error('Failed to insert project into galleries', __FILE__, __LINE__, $db->error());
+	unset($add);
+}
+
+if ($project_info['status'] == 'toomanyreports' && !$ms_user['is_mod']) {
+	echo '<h2>Project unavailable</h2>';
+	echo '<p>This project has been hidden because several Mod Share-ers reported it to be inappropriate. The Mod Share Team will review this project, and if it is deemed acceptable, it will be put back. Please read our <a href="/terms">terms of use</a>, and keep on modding.</p>';
+	return;
+}
+if ($project_info['status'] == 'toomanyreports') {
+	echo '<p style="color:#F00; font-weight:bold">Notice: this project has been automatically hidden due to several reports.<br /><a href="?allow">Click here to re-allow it</a></p>';
 }
 ?>
 
@@ -379,12 +484,29 @@ if ($ms_user['id'] == $project_info['uploaded_by']) {
 ?>
 
 <?php if ($ms_user['valid']) { ?>
-<p><a onclick="document.getElementById('flagform').style.display = 'block';" style="cursor:pointer"><img src="/img/flag.png" width="22" height="22" alt="flag" /> Flag as inappropriate</a></p>
+<p><a onclick="document.getElementById('flagform').style.display = 'block';" style="cursor:pointer"><img src="/img/flag.png" width="22" height="22" alt="flag" /> Flag as inappropriate</a> &bull; <a onclick="document.getElementById('galleryform').style.display = 'block';" style="cursor:pointer"> Add to a gallery</a></p>
 <form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post" enctype="multipart/form-data" style="display:none" id="flagform">
 	<p>Please enter a short reason why you are flagging this project.<br />
 	<textarea rows="5" cols="60" name="reason"></textarea><br />
 	<input type="submit" value="Flag project" />
 	</p>
+</form>
+<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post" enctype="multipart/form-data" style="display:none" id="galleryform">
+	<?php
+	$result = $db->query('SELECT g.id,g.name,g.url,gp.project_id FROM galleries AS g LEFT JOIN gallery_projects AS gp ON gp.gallery_id=g.id AND gp.project_id=' . $project_info['id'] . ' WHERE contributors LIKE \'%|' . $ms_user['id'] . '|%\' OR creator=' . $ms_user['id']) or error('Failed to get galleries', __FILE__, __LINE__, $db->error());
+	if ($db->num_rows($result)) {
+		echo '<table border="0">';
+		while (list($id,$name,$url,$exists) = $db->fetch_row($result)) {
+			echo '<tr><td><input type="checkbox" name="galleries[' . $id . ']" value="' . $id . '"';
+			if ($exists) {
+				echo ' checked="checked" disabled="disabled"';
+			}
+			echo '/></td><td><a href="/galleries/' . clearHTML($url) . '">' . clearHTML($name) . '</a></td></tr>';
+		}
+		echo '</table>';
+		echo '<p><input type="submit" name="gallery_form_sent" value="Add" /></p>';
+	}
+	?>
 </form>
 <?php
 }
@@ -402,7 +524,7 @@ if ($ms_user['is_mod']) {
 <form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post" enctype="multipart/form-data">
 	<textarea id="newComment" name="comment" rows="4" cols="60"></textarea><br />
 	<input type="hidden" name="noajax" value="yes" />
-	<input type="submit" onclick="sendComment(); return false" width="100px" />
+	<input type="submit" onclick="sendComment(); return false" width="100px" id="commentSubmit" />
 </form>
 <?php } ?>
 <div id="comments">
@@ -529,6 +651,13 @@ function sendComment() {
 	} else {
 		 req = new ActiveXObject("Microsoft.XMLHTTP");
 	}
+	
+	if (document.getElementById('newComment').value == '') {
+		alert('Please enter a comment'); return;
+	}
+	
+	document.getElementById('commentSubmit').disabled = true;
+	
 	req.open("POST", '<?php echo $_SERVER['REQUEST_URI']; ?>', true);
 	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
 	req.send("comment=" + encodeURIComponent(document.getElementById('newComment').value));
@@ -536,8 +665,15 @@ function sendComment() {
 	req.onreadystatechange = function() {
 		if (req.readyState==4 && req.status==200) {
 			document.getElementById('comments').innerHTML = req.responseText;
+			document.getElementById('commentSubmit').disabled = false;
 		} else {
-			//failure
+			if (req.status == 400) {
+				var resp = req.responseText;
+				if (resp == '[failed][reason=commentflood]') {
+					alert('At least <?php echo $ms_config['comment_flood']; ?> seconds must pass between comments. Please try again later');
+				}
+			}
+			document.getElementById('commentSubmit').disabled = false;
 		}
 	 }
 }
@@ -547,6 +683,11 @@ function submitReply(id) {
 	} else {
 		 req = new ActiveXObject("Microsoft.XMLHTTP");
 	}
+	
+	if (document.getElementById('replyto' + id).value == '') {
+		alert('Please enter a comment'); return;
+	}
+	
 	req.open("POST", '<?php echo $_SERVER['REQUEST_URI']; ?>', true);
 	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
 	req.send('origid=' + id + '&comment=' + encodeURIComponent(document.getElementById('replyto' + id).value));
@@ -555,7 +696,12 @@ function submitReply(id) {
 		if (req.readyState==4 && req.status==200) {
 			document.getElementById('comments').innerHTML = req.responseText;
 		} else {
-			//failure
+			if (req.status == 400) {
+				var resp = req.responseText;
+				if (resp == '[failed][reason=commentflood]') {
+					alert('At least <?php echo $ms_config['comment_flood']; ?> seconds must pass between comments. Please try again later');
+				}
+			}
 		}
 	 }
 }

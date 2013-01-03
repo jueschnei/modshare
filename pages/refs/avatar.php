@@ -1,7 +1,12 @@
 <?php
 $content_type = 'image/png';
-$result = $db->query('SELECT avatar FROM users
-WHERE id=' . intval($dirs[2])) or error('Failed to get avatar', __FILE__, __LINE__, $db->error());
+if (is_numeric($dirs[2])) {
+	$result = $db->query('SELECT avatar FROM users
+	WHERE id=' . intval($dirs[2])) or error('Failed to get avatar', __FILE__, __LINE__, $db->error());
+} else {
+	$result = $db->query('SELECT avatar FROM users
+	WHERE username=\'' . $db->escape($dirs[2]) . '\'') or error('Failed to get avatar', __FILE__, __LINE__, $db->error());
+}
 if ($db->num_rows($result)) {
 	$info = $db->fetch_assoc($result);
 	if ($info['avatar'] == '') {

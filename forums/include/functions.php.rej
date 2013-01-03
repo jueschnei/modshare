@@ -1,0 +1,76 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 684
+- // Delete a topic and all of it's posts
+--- 684 -----
++ // Delete a topic and all of its posts
+***************
+*** 802
+- 	static $ban_list, $pun_ranks;
+--- 802 -----
++ 	static $ban_list;
+***************
+*** 813,828
+- 	// If not already loaded in a previous call, load the cached ranks
+- 	if ($pun_config['o_ranks'] == '1' && !defined('PUN_RANKS_LOADED'))
+- 	{
+- 		if (file_exists(FORUM_CACHE_DIR.'cache_ranks.php'))
+- 			include FORUM_CACHE_DIR.'cache_ranks.php';
+- 
+- 		if (!defined('PUN_RANKS_LOADED'))
+- 		{
+- 			if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
+- 				require PUN_ROOT.'include/cache.php';
+- 
+- 			generate_ranks_cache();
+- 			require FORUM_CACHE_DIR.'cache_ranks.php';
+- 		}
+- 	}
+- 
+--- 0 -----
+***************
+*** 843,857
+- 	{
+- 		// Are there any ranks?
+- 		if ($pun_config['o_ranks'] == '1' && !empty($pun_ranks))
+- 		{
+- 			foreach ($pun_ranks as $cur_rank)
+- 			{
+- 				if ($user['num_posts'] >= $cur_rank['min_posts'])
+- 					$user_title = pun_htmlspecialchars($cur_rank['rank']);
+- 			}
+- 		}
+- 
+- 		// If the user didn't "reach" any rank (or if ranks are disabled), we assign the default
+- 		if (!isset($user_title))
+- 			$user_title = $lang_common['Member'];
+- 	}
+--- 828 -----
++ 		$user_title = $lang_common['Member'];
+***************
+*** 886
+- 			$pages[] = '<a rel="prev" '.(empty($pages) ? ' class="item1"' : '').' href="'.$link.'&amp;p='.($cur_page - 1).'">'.$lang_common['Previous'].'</a>';
+--- 857 -----
++ 			$pages[] = '<a rel="prev"'.(empty($pages) ? ' class="item1"' : '').' href="'.$link.'&amp;p='.($cur_page - 1).'">'.$lang_common['Previous'].'</a>';
+***************
+*** 917
+- 			$pages[] = '<a rel="next" '.(empty($pages) ? ' class="item1"' : '').' href="'.$link.'&amp;p='.($cur_page +1).'">'.$lang_common['Next'].'</a>';
+--- 888 -----
++ 			$pages[] = '<a rel="next"'.(empty($pages) ? ' class="item1"' : '').' href="'.$link.'&amp;p='.($cur_page +1).'">'.$lang_common['Next'].'</a>';
+***************
+*** 1215
+- 	header('Content-type: text/html; charset=utf-8');
+--- 1186 -----
++ 	header('Content-type: '.get_mime().'; charset=utf-8');
+***************
+*** 1343
+- 	header('Content-type: text/html; charset=utf-8');
+--- 1318 -----
++ 	header('Content-type: '.get_mime().'; charset=utf-8');
+***************
+*** 1396
+- <meta http-equiv="refresh" content="<?php echo $pun_config['o_redirect_delay'] ?>;URL=<?php echo str_replace(array('<', '>', '"'), array('&lt;', '&gt;', '&quot;'), $destination_url) ?>" />
+--- 1371,1372 -----
++ <meta http-equiv="Content-Type" content="<?php echo get_mime() ?>; charset=utf-8" />
++ <meta http-equiv="refresh" content="<?php echo $pun_config['o_redirect_delay'] ?>;URL=<?php echo $destination_url ?>" />

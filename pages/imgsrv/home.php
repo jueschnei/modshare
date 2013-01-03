@@ -32,6 +32,7 @@ if (isset($_POST['awesomescreenshoturl']) && $ms_user['is_admin']) {
 }
 if (isset($_POST['delfile'])) {
 	unlink(SRV_ROOT . '/data/imgsrv/' . $ms_user['id'] . '/' . basename($_POST['delfile']));
+	$db->query('DELETE FROM imgsrv WHERE id=' . intval($_POST['delid']) . ' AND user=' . $ms_user['id']) or error('Failed to delete image', __FILE__, __LINE__, $db->error());
 }
 $page_title = 'Image Service - Mod Share';
 ?>
@@ -60,7 +61,7 @@ if ($ms_user['is_admin']) {
 	<th>Delete</th>
 </tr>
 <?php
-$result = $db->query('SELECT filename,uploaded FROM imgsrv
+$result = $db->query('SELECT filename,uploaded,id FROM imgsrv
 WHERE user=' . $getid . '
 ORDER BY filename ASC') or error('Failed to get users', __FILE__, __LINE__, $db->error());
 while ($image = $db->fetch_assoc($result)) {
@@ -68,7 +69,7 @@ while ($image = $db->fetch_assoc($result)) {
 		<td><a href="/imgsrv/view/' . $getid . '/' . clearHTML($image['filename']) . '">' . clearHTML($image['filename']) . '</a></td>
 		<td><code>[img]http://' . $_SERVER['HTTP_HOST'] . '/imgsrv/view/' . $getid . '/' . clearHTML($image['filename']) . '[/img]</code></td>
 		<td>' . format_date($image['uploaded']) . '</td>
-		<th><form style="display:inline" action="/imgsrv' . (isset($_GET['uid']) ? '?uid=' . $getid : '') . '" method="post" enctype="multipart/form-data"><input type="hidden" name="delfile" value="' . clearHTML($image['filename']) . '" /><input type="submit" value="Delete" /></form></th>
+		<th><form style="display:inline" action="/imgsrv' . (isset($_GET['uid']) ? '?uid=' . $getid : '') . '" method="post" enctype="multipart/form-data"><input type="hidden" name="delfile" value="' . clearHTML($image['filename']) . '" /><input type="hidden" name="delid" value="' . $image['id'] . '" /><input type="submit" value="Delete" /></form></th>
 	</tr>';
 }
 ?>

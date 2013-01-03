@@ -14,7 +14,7 @@ LEFT JOIN users AS u ON u.id=b.user_id') or error('Failed to check bans', __FILE
 		<th>Username</th>
 		<th style="max-width: 300px;">IP addresses</th>
 		<th>Expires</th>
-		<th>Message</th>
+		<th style="max-width: 50%;">Message</th>
 		<th>Edit</th>
 	</tr>
 	<?php
@@ -30,7 +30,7 @@ LEFT JOIN users AS u ON u.id=b.user_id') or error('Failed to check bans', __FILE
 		echo implode($iplist, '<br />');
 		echo '</td>
 		<td>' . format_date($cur_ban['expires'], true) . '</td>
-		<td>' . clearHTML($cur_ban['message']) . '</td>
+		<td style="max-width: 50%;">' . $cur_ban['message'] . '</td>
 		<td><a href="/admin/edit_ban/' . $cur_ban['id'] . '">Edit</a></td>
 	</tr>';
 	}

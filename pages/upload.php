@@ -54,16 +54,16 @@ if (isset($_POST['title'])) {
 			} else {
 				die('badlogin');
 			}
+			//add search entry
+			$words = array_merge(split_into_words($_POST['title']), split_into_words($_POST['description']));
+			foreach ($words as &$val) {
+				$val = '(' . $id . ',\'' . $db->escape($val) . '\')';
+			}
+			$db->query('INSERT INTO search_index(project,word)
+			VALUES' . implode(',', $words)) or error('Failed to update search entry', __FILE__, __LINE__, $db->error());
+			
 		} else {
-			$db->query('INSERT INTO uploadqueue(username,time,description,modification,license,title)
-			VALUES(\'' . $db->escape($_POST['un']) . '\',
-			' . time() . ',
-			\'' . $db->escape($_POST['description']) . '\',
-			\'' . $db->escape($_POST['mod']) . '\',
-			\'' . $db->escape($_POST['license']) . '\',
-			\'' . $db->escape($_POST['title']) . '\')') or file_put_contents(SRV_ROOT . '/error.txt', $db->error() . "\n" . $_POST['description']);
-			file_put_contents(SRV_ROOT . '/data/uploadqueue/' . $db->insert_id(), $_POST['project']);
-			echo 'queued';
+			echo 'failed - queue not supported';
 		}
 		unlink(SRV_ROOT . '/cache/cache_projects.php');
 	}
@@ -77,21 +77,29 @@ if (isset($_POST['title'])) {
 			echo 'Invalid file extension.';
 			return;
 		}
-		$thumbnail_file = file_get_contents($_FILES['thumbnail']['tmp_name']);
-		$db->query('INSERT INTO projects(title,filename,license,uploaded_by,modification,thumbnail,description,time,ip_addr)
+		$db->query('INSERT INTO projects(title,filename,license,uploaded_by,modification,description,time,ip_addr)
 		VALUES(\'' . $db->escape($_POST['title']) . '\',
 		\'' . $db->escape($_FILES['pfile']['name']) . '\',
 		\'' . $_POST['license'] . '\',
 		' . $ms_user['id'] . ',
 		\'' . $_POST['mod'] . '\',
-		\'' . $db->escape($thumbnail_file) . '\',
 		\''. $db->escape($_POST['desc']) . '\',
 		' . time() . ',
 		\'' . $db->escape($_SERVER['REMOTE_ADDR']) . '\')') or error('Failed to upload project', __FILE__, __LINE__, $db->error());
+		move_uploaded_file($_FILES['thumbnail']['tmp_name'], SRV_ROOT . '/data/icons/project/' . $db->insert_id() . '.png');
 		move_uploaded_file($_FILES['pfile']['tmp_name'], SRV_ROOT . '/data/projects/' . $db->insert_id());
 		
 		addlog('Project ' . $db->insert_id() . ' uploaded: ' . $_POST['title']);
 		unlink(SRV_ROOT . '/cache/cache_projects.php');
+		
+		//add search entry
+		$words = array_merge(split_into_words($_POST['title']), split_into_words($_POST['desc']));
+		foreach ($words as &$val) {
+			$val = '(' . $db->insert_id() . ',\'' . $db->escape($val) . '\')';
+		}
+		$db->query('INSERT INTO search_index(project,word)
+		VALUES' . implode(',', $words)) or error('Failed to update search entry', __FILE__, __LINE__, $db->error());
+		
 		header('Location: /projects/' . $ms_user['username'] . '/' . $db->insert_id()); die;
 	} else {
 		$problem = true;
@@ -137,7 +145,7 @@ if ($problem) {
 				<select name="mod">
 					<?php
 					foreach ($modlist as $key => $val) {
-						echo '<option value="' . $key . '">' . $val['name'] . '</option>';
+						echo '<option value="' . $key . '">' . strip_tags($val['name']) . '</option>';
 					}
 					?>
 				</select>

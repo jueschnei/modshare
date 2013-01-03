@@ -1,0 +1,7 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 24
+- 'Email flood'				=>	'This account has already requested a password reset in the past hour. Please wait a while before requesting a new password again.'
+--- 24 -----
++ 'Email flood'				=>	'This account has already requested a password reset in the past hour. Please wait %s minutes before requesting a new password again.'

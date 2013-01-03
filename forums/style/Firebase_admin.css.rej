@@ -1,0 +1,12 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 37
+- #adminconsole fieldset tbody th {
+--- 37 -----
++ #adminconsole fieldset th {
+***************
+*** 85
+- #censoring .tcl, #censoring .tc2, #ranks .tcl, #ranks .tc2 {
+--- 85 -----
++ #censoring .tcl, #censoring .tc2 {

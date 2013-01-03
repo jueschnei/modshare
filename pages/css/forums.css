@@ -1,7 +1,8 @@
 <?php
 $content_type = 'text/css';
 
-$style = $ms_user['style_col'];
+#$style = $ms_user['style_col'];
+$style = '44A';
 $r = hexdec($style{0});
 $g = hexdec($style{1});
 $b = hexdec($style{2});
@@ -20,6 +21,9 @@ body  {
 	margin: 0;
 	padding: 0;
 	color: #000000;
+	background-image:url(/img/snow.jpg) !important;
+	background-size:100% 1200px;
+	background-repeat:repeat-y;
 }
 #container {
 	border-bottom-left-radius: 4px;
@@ -34,14 +38,34 @@ body  {
 	margin: 0 26% 0 10px;
 	background-color:#FFF;
 }
-a {
-	color: #<?php echo $dark; ?>;
+#brdheader #brdmenu {
+	background-color:#444;
+}
+
+.pun h2 {
+	background-color:#444 !important;
+}
+.pun .box {
+	border-color:#444 !important;
+}
+.pun a {
+	color:#9BD !important;
+}
+.linkst {
+	color:#000;
+}
+.box a {
+	color:#39F !important;
 	text-decoration: none;
+}
+.iclosed a {
+	color:#AAA !important;
 }
 a:hover {
 	color: #<?php echo $lighter; ?>;
 	text-decoration: none;
 }
+
 img {
 	border: none 0px #FFF;
 }
@@ -83,6 +107,20 @@ img {
 }
 .ltd {
 	width:100px;
+}
+.announcement {
+	border-radius: 3px;
+	background-color:#3AC;
+	margin-left: 5px;
+	margin-top: 5px;
+	padding: 3px;
+	width: 100%;
+}
+.announcement a {
+	color:#<?php echo $light; ?>;
+}
+.announcement a:hover {
+	color:#<?php echo $lighter; ?>;
 }
 
 /* *********************FOOTER********************* */

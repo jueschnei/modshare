@@ -7,31 +7,10 @@ if (isset($_POST['form_sent'])) {
 	set_config('maintenance_msg', $_POST['maintenance_msg']);
 	set_config('announcement', $_POST['announcement']);
 	set_config('election', $_POST['election']);
+	set_config('comment_flood', $_POST['comment_flood']);
 	header('Refresh: 0');
 
 	addlog('Updated site configuration'); die;
-}
-
-if(isset($_POST['goquery'])) {
-	$qry = $_POST['qry'];
-	$result = $db->query($qry) or error('Failed MySQL query', __FILE__, __LINE__, $db->error());
-	if ($db->num_rows($result)) {
-		echo '<h3>Query results</h3>';
-		echo '<table border="0">';
-		$fields = $db->fetch_fields($result);
-		echo '<tr>';
-		foreach ($fields as $val) {
-			echo '<th>' . $val->name . '</th>';
-		}
-		echo '</tr>';
-		$outresults = array();
-		while($currdata = $db->fetch_assoc($result)) {
-			$outresults[] = '<tr><td>' . implode('</td><td>', $currdata) . '</td></tr>';
-		}
-		echo implode($outresults);
-		echo '</table>';
-	}
-	addlog('Executed custom query: ' . $qry);
 }
 
 ?>
@@ -46,13 +25,6 @@ if(isset($_POST['goquery'])) {
 <p>Server root: <?php echo SRV_ROOT; ?></p>
 <h3>Management pages</h3>
 <p><a href="/admin/maintenance">Maintenance</a></p>
-<h3>MySQL query</h3>
-<form id="mysql" name="mysql" method="post" action="/admin/admin_menu">
-  <p>
-    <textarea name="qry" rows="5" cols="50"></textarea><br />
-    <input type="submit" name="goquery" id="goquery" value="Submit" style="min-height: 26px;" />
-  </p>
-</form>
 <form action="/admin/admin_menu" method="post" enctype="multipart/form-data">
   <h3>Site status</h3>
 
@@ -71,6 +43,14 @@ if(isset($_POST['goquery'])) {
 	<p><strong>Maintenance message</strong><br /><textarea name="maintenance_msg" rows="4" cols="60"><?php echo clearHTML($ms_config['maintenance_msg']); ?></textarea></p>
 
 	<p><strong>Announcement message</strong><br /><textarea name="announcement" rows="4" cols="60"><?php echo clearHTML($ms_config['announcement']); ?></textarea></p>
+	
+	<h3>Other config options</h3>
+	<table border="0">
+		<tr>
+			<td>Comment flood</td>
+			<td><input type="text" name="comment_flood" value="<?php echo $ms_config['comment_flood']; ?>" /></td>
+		</tr>
+	</table>
 
 	<input type="submit" name="form_sent" value="Save changes" />
 

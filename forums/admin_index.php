@@ -126,6 +126,30 @@ generate_admin_menu('index');
 		<h2><span><?php echo $lang_admin_index['Forum admin head'] ?></span></h2>
 		<div id="adintro" class="box">
 			<div class="inbox">
+				<?php switch ($_GET['help']) {
+				case 'usertags': ?>
+				<p>The following user tags are usable:</p>
+				<table border="0">
+					<tr>
+						<th>[nopromote]</th>
+						<td>Prevents user from being promoted to a full member</td>
+					</tr>
+					<tr>
+						<th>[promotedelay=XX]</th>
+						<td>User must wait XX days after 14 before being promoted to a full member</td>
+					</tr>
+					<tr>
+						<th>[noedit]</th>
+						<td>Prevents user from editing posts</td>
+					</tr>
+					<tr>
+						<th>[nopoll]</th>
+						<td>Prevents user from posting polls</td>
+					</tr>
+				</table>
+				<?php
+					break;
+				default: ?>
 				<p><?php echo $lang_admin_index['Welcome to admin'] ?></p>
 				<ul>
 					<li><span><?php echo $lang_admin_index['Welcome 1'] ?></span></li>
@@ -138,6 +162,8 @@ generate_admin_menu('index');
 					<li><span><?php echo $lang_admin_index['Welcome 8'] ?></span></li>
 					<li><span><?php echo $lang_admin_index['Welcome 9'] ?></span></li>
 				</ul>
+				<?php break;
+				} ?>
 			</div>
 		</div>
 

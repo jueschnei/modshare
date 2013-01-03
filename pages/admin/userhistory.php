@@ -24,7 +24,7 @@ $page_title = $user_info['username'] . '&apos;s history';
 		echo '<tr>
 			<td style="padding: 5px">' . format_date($cur_action['time']) . '</td>
 			<td style="padding: 5px">' . clearHTML($cur_action['by_user']) . '</td>
-			<td style="padding: 5px">' . clearHTML($cur_action['action']) . '</td>
+			<td style="padding: 5px">' . clearHTML($cur_action['action'], true) . '</td>
 		</tr>';
 	}
 	?>

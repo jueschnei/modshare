@@ -15,7 +15,19 @@ if (isset($_POST['badflag'])) {
 		$db->query('INSERT INTO notifications(user,type,message)
 		VALUES(' . $flagger . ',1,\'Please do not flag projects or comments unnecessarily.\')') or error('Failed to send notification', __FILE__, __LINE__, $db->error());
 		$db->query('INSERT INTO adminhistory(to_user,from_user,time,action)
-		VALUES(' . $flagger . ',' . $ms_user['id'] . ',' . time() . ',\'Flagged an unnecessary project.\')') or error('Failed to send notification', __FILE__, __LINE__, $db->error());
+		VALUES(' . $flagger . ',' . $ms_user['id'] . ',' . time() . ',\'' . $db->escape('Admin notification: \'Please do not flag projects or comments unnecessarily.\'') . '\')') or error('Failed to send notification', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE flags
+		SET zapped=' . time() . '
+		WHERE id=' . intval($key)) or error('Failed to mark flag as bad flag', __FILE__, __LINE__, $db->error());
+	}
+}
+if (isset($_POST['goodflag'])) {
+	foreach ($_POST['goodflag'] as $key => $val) {
+		$result = $db->query('SELECT flagged_by FROM flags
+		WHERE id=' . intval($key)) or error('Failed to get flagger', __FILE__, __LINE__, $db->error());
+		list($flagger) = $db->fetch_row($result);
+		$db->query('INSERT INTO notifications(user,type,message)
+		VALUES(' . $flagger . ',1,\'Your comment/project flag has been processed and appropriate action has been taken. Thank you for helping us keep this website safe.\')') or error('Failed to send notification', __FILE__, __LINE__, $db->error());
 		$db->query('UPDATE flags
 		SET zapped=' . time() . '
 		WHERE id=' . intval($key)) or error('Failed to mark flag as bad flag', __FILE__, __LINE__, $db->error());
@@ -81,8 +93,9 @@ while ($cur_flag = $db->fetch_assoc($result)) {
 		<a href="/users/' . $cur_flag['flagger_username'] . '">' . $cur_flag['flagger_username'] . '</a>
 	</td>
 	<td>
-		<input type="submit" name="markread[' . $cur_flag['id'] . ']" value="Mark as read" style="width: 120px" /><br />
-		<input type="submit" name="badflag[' . $cur_flag['id'] . ']" value="Bad flag" style="width: 120px" />
+		<input type="submit" name="markread[' . $cur_flag['id'] . ']" value="Ignore" style="width: 120px" /><br />
+		<input type="submit" name="badflag[' . $cur_flag['id'] . ']" value="Bad flag" style="width: 120px" /><br />
+		<input type="submit" name="goodflag[' . $cur_flag['id'] . ']" value="Action taken" style="width: 120px" />
 	</td>
 </tr>';
 }

@@ -19,7 +19,11 @@ if ($db->num_rows($result)) {
 			}
 			$last_type = $cur_notification['type'];
 		}
-		echo "\n" . '<p id="notification' . $cur_notification['id'] . '"><a onclick="removeNotification(' . $cur_notification['id'] . ')" style="cursor: pointer;">(x)</a> ' . $cur_notification['message'] . '</p>';
+		echo "\n" . '<p id="notification' . $cur_notification['id'] . '"><a onclick="removeNotification(' . $cur_notification['id'] . ')" style="cursor: pointer;">(x)</a> ' . $cur_notification['message'];
+		if ($cur_notification['type'] == 1) {
+			echo '<br /><a href="/appeal_notification/' . $cur_notification['id'] . '">Appeal or reply to this notification</a> (if you appeal, do not delete this message until after you submit the appeal)';
+		}
+		echo '</p>';
 	}
 }
 echo '</div>';
@@ -44,6 +48,12 @@ function removeNotification(id) {
 		}
 	 }
 	document.getElementById('notifications').removeChild(document.getElementById('notification' + id));
+	var numNotifs = parseInt(document.getElementById('numnotifs').innerHTML);
+	numNotifs--;
+	document.getElementById('numnotifs').innerHTML = numNotifs;
+	if (numNotifs == 0) {
+		document.getElementById('notificationsalert').style.display = 'none';
+	}
 }
 //]]>
 </script>

@@ -1,0 +1,8 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 84
+- 'Invalid website URL'					=>	'The website URL you entered is invalid.',
+--- 84,85 -----
++ 'Invalid website URL'			=>	'The website URL you entered is invalid.',
++ 'Website not allowed'			=>	'You are not allowed to add a website to your profile yet.',

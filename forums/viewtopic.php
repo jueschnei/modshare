@@ -235,10 +235,7 @@ while ($cur_post = $db->fetch_assoc($result))
 	// If the poster is a registered user
 	if ($cur_post['poster_id'] > 1)
 	{
-		if ($pun_user['g_view_users'] == '1')
-			$username = '<a href="/users/'.pun_htmlspecialchars($cur_post['username']).'">' . pun_htmlspecialchars($cur_post['username']) . '</a>';
-		else
-			$username = pun_htmlspecialchars($cur_post['username']);
+		$username = '<a href="/users/'.pun_htmlspecialchars($cur_post['username']).'">' . pun_htmlspecialchars($cur_post['username']) . '</a>';
 
 		$user_title = get_title($cur_post);
 

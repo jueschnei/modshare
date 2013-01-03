@@ -1,0 +1,32 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 427
+- .pun .linkst .inbox, .pun linksb .inbox, .pun .postlinksb .inbox {
+--- 428 -----
++ .pun .linkst .inbox, .pun .linksb .inbox, .pun .postlinksb .inbox {
+***************
+*** 1305,1326
+- }
+- 
+- .pun .checklist .checklist-item {
+- 	position: relative;
+- }
+- 
+- .pun .checklist .checklist-item label {
+- 	padding: 0 0 0 1.75em;
+- }
+- 
+- .pun .checklist .checklist-item .fld-input {
+- 	position: absolute;
+- 	left: 0;
+- 	top: 0;
+- 	padding: 0;
+- 	margin: 0;
+- }
+- 
+- .pun .checklist .checklist-item input {
+- 	margin: 0;
+- 	height: 1.55em;
+- 	width: 1.55em;
+--- 0 -----

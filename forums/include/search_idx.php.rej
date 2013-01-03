@@ -1,0 +1,7 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 107
+- 	// If the word if CJK we don't want to index it, but we do want to be allowed to search it
+--- 107 -----
++ 	// If the word is CJK we don't want to index it, but we do want to be allowed to search it

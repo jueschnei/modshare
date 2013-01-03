@@ -1,0 +1,17 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 3
+- // Language definitions used in admin-options.php
+--- 3 -----
++ // Language definitions used in admin_options.php
+***************
+*** 126,127
+- 'User ranks label'					=>	'User ranks',
+- 'User ranks help'					=>	'Enable this to use user ranks. See %s for more info.',
+--- 0 -----
+***************
+*** 166
+- 'Use avatars help'					=>	'When enabled, users will be able to upload an avatar which will be displayed under their title/rank.',
+--- 164 -----
++ 'Use avatars help'					=>	'When enabled, users will be able to upload an avatar which will be displayed under their title.',

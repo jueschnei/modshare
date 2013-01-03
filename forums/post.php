@@ -159,7 +159,7 @@ if (isset($_POST['form_sent']))
 
 	$now = time();
 	
-	if ($pun_user['group_id'] == 5 || $pun_user['group_id'] == 6) {
+	if ($pun_user['group_id'] == NEW_USER_GROUP_ID || $pun_user['group_id'] == RESTRICTED_USER_GROUP_ID) {
 		if (preg_match('%\[img(.*?)\]%i', $message)) {
 			switch ($pun_user['group_id']) {
 			case 5:
@@ -169,7 +169,7 @@ if (isset($_POST['form_sent']))
 			}
 		}
 	}
-	if ($pun_user['group_id'] == 6) {
+	if ($pun_user['group_id'] == RESTRICTED_USER_GROUP_ID) {
 		if (preg_match('%\[url(.*?)\]%i', $message)) {
 			$errors[] = 'You can\'t post links.';
 		}
@@ -713,7 +713,9 @@ if (!empty($checkboxes))
 ?>
 			</div>
 			<?php
-			poll_form_post($tid);
+			if (!strstr($pun_user['admin_note'], '[nopoll]')) {
+				poll_form_post($tid);
+			}
 			?>
 			<p class="buttons"><input type="submit" name="submit" value="<?php echo $lang_common['Submit'] ?>" tabindex="<?php echo $cur_index++ ?>" accesskey="s" /> <input type="submit" name="preview" value="<?php echo $lang_post['Preview'] ?>" tabindex="<?php echo $cur_index++ ?>" accesskey="p" /> <a href="javascript:history.go(-1)"><?php echo $lang_common['Go back'] ?></a></p>
 		</form>

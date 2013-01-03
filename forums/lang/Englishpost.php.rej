@@ -1,0 +1,8 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 29,30
+- 'Flood start'		=>	'At least',
+- 'flood end'			=>	'seconds have to pass between posts. Please wait a little while and try posting again.',
+--- 29 -----
++ 'Flood start'		=>	'At least %s seconds have to pass between posts. Please wait %s seconds and try posting again.',

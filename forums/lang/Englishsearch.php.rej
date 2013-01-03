@@ -1,0 +1,7 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 9
+- 'Search flood'						=>	'At least %s seconds have to pass between searches. Please wait a while and try searching again.',
+--- 9 -----
++ 'Search flood'						=>	'At least %s seconds have to pass between searches. Please wait %s seconds and try searching again.',

@@ -1,0 +1,7 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 3
+- // Language definitions used in admin-categories.php
+--- 3 -----
++ // Language definitions used in admin_categories.php

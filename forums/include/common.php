@@ -18,7 +18,11 @@ define('FORUM_SI_REVISION', 2);
 define('FORUM_PARSER_REVISION', 2);
 
 //define some constants
+define('NEW_USER_GROUP_ID', 5);
+define('RESTRICTED_USER_GROUP_ID', 6);
 define('TOO_MANY_REPORTS', 3); //after this many reports, the post will be hidden and the poster banned for 24 hours
+define('NEW_USER_SIG_LENGTH', 200); //new Mod Share-ers may only ahve a sig this long
+define('NEW_USER_SIG_LINES', 2); //new Mod Share-ers may only ahve a sig this many lines
 
 // Block prefetch requests
 if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
@@ -313,12 +317,15 @@ if ($ms_user['valid'] && !$pun_user['is_guest']) {
 		WHERE id=' . $pun_user['id']) or error('Failed to update group ID', __FILE__, __LINE__, $db->error());
 		header('Refresh: 0'); die;
 	}
-	if ($pun_user['group_id'] == 5) {
+	if ($pun_user['group_id'] == NEW_USER_GROUP_ID && !stristr($pun_user['admin_note'], '[nopromote]')) {
 		//promote new Mod Share-ers to Mod Share-ers
 		$result = $db->query('SELECT 1 FROM projects
 		WHERE id=' . $ms_user['id']) or error('Failed to get project count', __FILE__, __LINE__, $db->error());
 		$num_projects = $db->num_rows($result);
 		$days_registered = floor((time() - $pun_user['registered']) / 60 / 60 / 24);
+		if (preg_match('%\[promotedelay=(.*?)\]%', $pun_user['admin_note'], $matches)) {
+			$days_registered -= ($matches[1] * 60 * 60 * 24);
+		}
 		$score = floor((4 * $num_projects) + (.4 * $pun_user['num_posts']) + $days_registered);
 		if ($score > 30 && $num_projects > 0 && $pun_user['num_posts'] > 4 && $days_registered > 13) {
 			$db->query('UPDATE ' . $db->prefix . 'users
@@ -334,6 +341,8 @@ if (!$ms_user['valid'] && !$pun_user['is_guest']) {
 	$db->query('DELETE FROM '.$db->prefix.'online WHERE user_id='.$pun_user['id']) or error('Unable to delete from online list', __FILE__, __LINE__, $db->error());
 
 	pun_setcookie(1, pun_hash(uniqid(rand(), true)), time() + 31536000);
+	
+	header('Refresh: 0');
 }
 
 //check if timezone is correct

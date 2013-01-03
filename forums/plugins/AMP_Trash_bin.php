@@ -134,6 +134,14 @@ function display_header($trash_infos = FALSE)
 	}
 }
 
+//submit reply
+if (isset($_POST['submit_topic_reply'])) {
+	$db->query('INSERT INTO ' . $db->prefix . 'posts() VALUES()') or error('Failed to make blank post', __FILE__, __LINE__, $db->error());
+	$id = $db->insert_id();
+	$db->query('INSERT INTO ' . $db->prefix . 'trash_posts(id,poster,poster_id,message,posted,topic_id) VALUES(' . $id . ',\'' . $db->escape($pun_user['username']) . '\',' . $pun_user['id'] . ',\'' . $db->escape($_POST['reply']) . '\',' . time() . ',' . intval($_GET['tid']) . ')') or error('Failed to insert reply', __FILE__, __LINE__, $db->error());
+	$db->query('DELETE FROM ' . $db->prefix . 'posts WHERE id=' . $id) or error('Failed to delete blank post', __FILE__, __LINE__, $db->error());
+}
+
 // Delete / restore post from trash bin
 if(isset($_POST['pid']))
 {
@@ -636,6 +644,7 @@ INNER JOIN '.$db->prefix.'topics AS t ON tp.topic_id = t.id AND tp.post_alone = 
 								}
 							?>
 						</table>
+					</div>
 							<?php
 						
 						}			
@@ -673,6 +682,7 @@ INNER JOIN '.$db->prefix.'topics AS t ON tp.topic_id = t.id AND tp.post_alone = 
 								}
 							?>
 						</table>
+					</div>
 							<?php
 						}
 						else
@@ -712,6 +722,17 @@ INNER JOIN '.$db->prefix.'topics AS t ON tp.topic_id = t.id AND tp.post_alone = 
 								<?php
 							}
 							?>
+									<tr>
+										<th>Post reply</th>
+									</tr>
+									<tr>
+										<td>
+											<form action="<?php echo pun_htmlspecialchars($_SERVER['REQUEST_URI']); ?>" method="post" enctype="multipart/form-data">
+												<p><textarea name="reply" rows="5" cols="60"></textarea></p>
+												<p><input type="submit" name="submit_topic_reply" value="Post reply" /></p>
+											</form>
+										</td>
+									</tr>
 								</table>
 							</div>
 							<?php

@@ -35,6 +35,12 @@ require PUN_ROOT.'lang/'.$pun_user['language'].'/prof_reg.php';
 require PUN_ROOT.'lang/'.$pun_user['language'].'/profile.php';
 
 
+//new Mod Share-er restrictions on sig length
+if ($pun_user['group_id'] == NEW_USER_GROUP_ID) {
+	$pun_config['p_sig_length'] = NEW_USER_SIG_LENGTH;
+	$pun_config['p_sig_lines'] = NEW_USER_SIG_LINES;
+}
+
 if ($action == 'change_pass')
 {
 	if (isset($_GET['key']))
@@ -839,6 +845,12 @@ else if (isset($_POST['form_sent']))
 					$errors = array();
 
 					$form['signature'] = preparse_bbcode($form['signature'], $errors, true);
+					
+					if ($pun_user['group_id'] == NEW_USER_GROUP_ID) {
+						if (preg_match('%\[img(.*?)\]%i', $form['signature'])) {
+							$errors[] = 'New Mod Share-ers can not put images in signatures.';
+						}
+					}
 
 					if(count($errors) > 0)
 						message('<ul><li>'.implode('</li><li>', $errors).'</li></ul>');
@@ -1394,7 +1406,7 @@ else
 							<p><?php printf($lang_profile['Last visit info'], format_time($user['last_visit'])) ?></p>
 							<?php echo $posts_field ?>
 <?php if ($pun_user['is_admmod']): ?>							<label><?php echo $lang_profile['Admin note'] ?><br />
-							<input id="admin_note" type="text" name="admin_note" value="<?php echo pun_htmlspecialchars($user['admin_note']) ?>" size="30" maxlength="30" /><br /></label>
+							<input id="admin_note" type="text" name="admin_note" value="<?php echo pun_htmlspecialchars($user['admin_note']) ?>" size="30" maxlength="30" /> <a href="admin_index.php?help=usertags">Tag help</a><br /></label>
 							<label>Points: <?php
 							$result = $db->query('SELECT 1 FROM projects AS p
 							LEFT JOIN users AS u

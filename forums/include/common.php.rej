@@ -1,0 +1,12 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 13
+- define('FORUM_VERSION', '1.4.9');
+--- 13 -----
++ define('FORUM_VERSION', '1.5.1');
+***************
+*** 15
+- define('FORUM_DB_REVISION', 15);
+--- 15 -----
++ define('FORUM_DB_REVISION', 18);

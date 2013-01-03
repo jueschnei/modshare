@@ -1,0 +1,11 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 3
+- // Language definitions used in admin_common
+--- 3 -----
++ // Language definitions used in admin_common.php
+***************
+*** 18
+- 'Ranks'					=>	'Ranks',
+--- 0 -----

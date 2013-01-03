@@ -72,13 +72,6 @@ $pages = array(
 		'prepend'	=> null
 	),
 	
-	'/browse' => array(
-		'file'		=> 'browseprojects.php',
-		'header'	=> true,
-		'permission'=> 0,
-		'prepend'	=> null
-	),
-	
 	'/player' => array(
 		'file'		=> 'swfdispatcher.php',
 		'header'	=> false,
@@ -194,6 +187,15 @@ $pages = array(
 		'permission'=> 1,
 		'prepend'	=> '/pages/imgsrv/prepend.php'
 	),
+	
+	//******************** GALLERIES *********************//
+	
+	'/newgallery' => array(
+		'file'		=> 'galleries/new.php',
+		'header'	=> true,
+		'permission'=> 1,
+		'prepend'	=> null
+	),
 
 	//******************** MISC. *********************//
 
@@ -224,6 +226,27 @@ $pages = array(
 		'permission'=> 0,
 		'prepend'	=> null
 	),
+	
+	'/search' => array(
+		'file'		=> 'search.php',
+		'header'	=> true,
+		'permission'=> 0,
+		'prepend'	=> null
+	),
+	
+	'/devs' => array(
+		'file'		=> 'devs.php',
+		'header'	=> true,
+		'permission'=> 0,
+		'prepend'	=> null
+	),
+	
+	'/mods' => array(
+		'file'		=> 'modinfo.php',
+		'header'	=> true,
+		'permission'=> 0,
+		'prepend'	=> null
+	),
 );
 
 $pageswithsubdirs = array(
@@ -236,6 +259,21 @@ $pageswithsubdirs = array(
 		'prepend'	=> null
 
 	),
+	
+	'/browse' => array(
+		'file'		=> 'browseprojects.php',
+		'header'	=> true,
+		'permission'=> 0,
+		'prepend'	=> null
+	),
+	
+	'/appeal_notification' => array(
+		'file'		=> 'appeal_notification.php',
+		'header'	=> true,
+		'permission'=> 1,
+		'prepend'	=> null
+
+	),
 	//******************** PROJECTS *********************//	
 	'/projects' => array(
 		'file'		=> 'projectviewer.php',
@@ -244,6 +282,14 @@ $pageswithsubdirs = array(
 		'prepend'	=> null
 
 	),
+	//******************** GALLERIES *********************//
+	'/galleries' => array(
+		'file'		=> 'galleries/view.php',
+		'header'	=> true,
+		'permission'=> 0,
+		'prepend'	=> null
+	),
+
 	//******************** ADMIN *********************//
 	'/admin/ban_user' => array(
 		'file'		=> 'admin/ban_user.php',
@@ -348,6 +394,13 @@ $pageswithsubdirs = array(
 	'/api' => array(
 		'file'		=> 'api/main.php',
 		'header'	=> false,
+		'permission'=> 0,
+		'prepend'	=> null
+	),
+	
+	'/casmessage' => array(
+		'file'		=> 'api/casmsg.php',
+		'header'	=> true,
 		'permission'=> 0,
 		'prepend'	=> null
 	),

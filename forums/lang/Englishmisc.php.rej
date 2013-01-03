@@ -1,0 +1,12 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 14
+- 'Email flood'					=>	'At least %s seconds have to pass between sent emails. Please wait a while and try sending again.',
+--- 14 -----
++ 'Email flood'					=>	'At least %s seconds have to pass between sent emails. Please wait %s seconds and try sending again.',
+***************
+*** 25
+- 'Report flood'					=>	'At least %s seconds have to pass between reports. Please wait a while and try sending again.',
+--- 25 -----
++ 'Report flood'					=>	'At least %s seconds have to pass between reports. Please wait %s seconds and try sending again.',

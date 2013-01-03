@@ -19,7 +19,10 @@ if ($dirs[3] == 'get') {
 	} else {
 		$db->query('INSERT INTO cloudvars(name,value)
 		VALUES(\'' . $db->escape($_POST['name']) . '\',\'' . $db->escape($_POST['val']) . '\')') or error('Failed to insert variable', __FILE__, __LINE__, $db->error());
-	}	
+	}
+} else if ($dirs[3] == 'getnewid') {
+	echo $ms_config['lastprojectid'] + 1;
+	set_config('lastprojectid', $ms_config['lastprojectid'] + 1);
 } else {
 	header('HTTP/1.1 400 Bad request');
 	echo 'Bad request';

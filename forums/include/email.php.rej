@@ -1,0 +1,45 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 161
+- 		// Update the main text if there is a replacment
+--- 161 -----
++ 		// Update the main text if there is a replacement
+***************
+*** 232
+- 	$headers = 'From: '.$from."\r\n".'Date: '.gmdate('r')."\r\n".'MIME-Version: 1.0'."\r\n".'Content-transfer-encoding: 8bit'."\r\n".'Content-type: text/plain; charset=utf-8'."\r\n".'X-Mailer: FluxBB Mailer';
+--- 232 -----
++ 	$headers = 'From: '.$from.PHP_EOL.'Date: '.gmdate('r').PHP_EOL.'MIME-Version: 1.0'.PHP_EOL.'Content-transfer-encoding: 8bit'.PHP_EOL.'Content-type: text/plain; charset=utf-8'.PHP_EOL.'X-Mailer: FluxBB Mailer';
+***************
+*** 239
+- 		$headers .= "\r\n".'Reply-To: '.$reply_to;
+--- 239 -----
++ 		$headers .= PHP_EOL.'Reply-To: '.$reply_to;
+***************
+*** 263
+- // They deserve all the credit for writing it. I made small modifications for it to suit PunBB and it's coding standards
+--- 263 -----
++ // They deserve all the credit for writing it. I made small modifications for it to suit PunBB and its coding standards
+***************
+*** 281
+- // They deserve all the credit for writing it. I made small modifications for it to suit PunBB and it's coding standards.
+--- 281 -----
++ // They deserve all the credit for writing it. I made small modifications for it to suit PunBB and its coding standards.
+***************
+*** 312
+- 		fwrite($socket, 'EHLO '.$smtp_host."\r\n");
+--- 312,325 -----
++ 		// Here we try to determine the *real* hostname (reverse DNS entry preferably)
++ 		$local_host = php_uname('n');
++ 
++ 		// Able to resolve name to IP
++ 		if (($local_addr = @gethostbyname($local_host)) !== $local_host)
++ 		{
++ 			// Able to resolve IP back to name
++ 			if (($local_name = @gethostbyaddr($local_addr)) !== $local_addr)
++ 			{
++ 				$local_host = $local_name;
++ 			}
++ 		}
++ 
++ 		fwrite($socket, 'EHLO '.$local_host."\r\n");

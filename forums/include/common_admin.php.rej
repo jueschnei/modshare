@@ -1,0 +1,6 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 63
+- 					<li<?php if ($page == 'ranks') echo ' class="isactive"'; ?>><a href="admin_ranks.php"><?php echo $lang_admin_common['Ranks'] ?></a></li>
+--- 0 -----

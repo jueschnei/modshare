@@ -1,0 +1,32 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 10
+- 'PHPinfo disabled message'			=>	'The PHP function phpinfo() has been disabled on this server.',
+--- 0 -----
+***************
+*** 21
+- 'Welcome 7'							=>	'Set up user ranks.',
+--- 20 -----
++ 'Welcome 7'							=>	'Set up user groups and promotions.',
+***************
+*** 24
+- 'Statistics head'					=>	'Statistics',
+--- 23 -----
++ 'About head'						=>	'About FluxBB',
+***************
+*** 0
+--- 27,35 -----
++ 'Server statistics label'			=>	'Server statistics',
++ 'View server statistics'			=>	'View server statistics',
++ 'Support label'						=>	'Support',
++ 'Forum label'						=>	'Forum',
++ 'IRC label'							=>	'IRC channel',
++ 
++ // Language definitions used in admin_statistics.php
++ 'PHPinfo disabled message'			=>	'The PHP function phpinfo() has been disabled on this server.',
++ 'Server statistics head'			=>	'Server statistics',
+***************
+*** 50
+- 
+--- 0 -----

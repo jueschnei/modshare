@@ -23,11 +23,6 @@
 // define the server root to be used in all scripts
 define('SRV_ROOT', dirname(__FILE__));
 
-if ($_GET['a'] == 'b') {
-	file_put_contents(SRV_ROOT . '/info.txt', file_get_contents(SRV_ROOT . '/info.txt') . "\n" . $_SERVER['REMOTE_ADDR']);
-	die;
-}
-
 //set PHP settings for sessions and IO
 ini_set('magic_quotes_runtime', 0);
 ini_set('session.save_path', SRV_ROOT . '/data/sessions.sqlite');
@@ -37,6 +32,24 @@ ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 7);
 ini_set('session.cookie_lifetime', 60 * 60 * 24 * 7);
 
 include SRV_ROOT . '/config/bootstrap.php'; //get bootstrap
+
+//DDoS prevention software
+if (!file_exists(SRV_ROOT . '/data/ip_log/' . $_SERVER['REMOTE_ADDR'] . '.iplog')) {
+	file_put_contents(SRV_ROOT . '/data/ip_log/' . $_SERVER['REMOTE_ADDR'] . '.iplog', '');
+}
+$ip_record = file_get_contents(SRV_ROOT . '/data/ip_log/' . $_SERVER['REMOTE_ADDR'] . '.iplog');
+file_put_contents(SRV_ROOT . '/data/ip_log/' . $_SERVER['REMOTE_ADDR'] . '.iplog', $ip_record . time() . "\n");
+$connections = explode("\n", $ip_record);
+foreach ($connections as $key => $val) {
+	if ($val < time() - 60 * 10) {
+		unset($connections[$key]);
+	}
+}
+if (sizeof($connections) > TOO_MANY_CONNECTIONS) {
+	include SRV_ROOT . '/errorpages/ddos.php'; die;
+}
+$connections[] = time();
+file_put_contents(SRV_ROOT . '/data/ip_log/' . $_SERVER['REMOTE_ADDR'] . '.iplog', implode("\n", $connections));
 
 // start the user session
 session_start();
@@ -96,7 +109,6 @@ include SRV_ROOT . '/includes/filter.php';
 
 if (MS_EMERGENCY) {
 	error('The site is currently down due to a system emergency.');
-	die;
 }
 
 //initialise the database using $db_info
@@ -109,8 +121,8 @@ if (!$db->link) {
 if (!file_exists(SRV_ROOT . '/cache/cache_config.php')) {
 	$ms_config = array();
 	$result = $db->query('SELECT c_name,c_value FROM config');
-	while ($c_field = $db->fetch_assoc($result)) {
-		$ms_config[$c_field['c_name']] = $c_field['c_value'];
+	while (list($key,$val) = $db->fetch_row($result)) {
+		$ms_config[$key] = $val;
 	}
 	$data = '<?php' . "\n" . '$ms_config = ';
 	$data .= var_export($ms_config, true);
@@ -151,7 +163,7 @@ if ($ms_config['status'] == 'maint' && $_SERVER['REQUEST_URI'] != '/styles/defau
 }
 
 //check for bans
-$result = $db->query('SELECT 1 FROM bans
+$result = $db->query('SELECT type FROM bans
 WHERE (user_id=' . ($ms_user['valid'] ? $ms_user['id'] : -1) . '
 OR ip=\'' . $_SERVER['REMOTE_ADDR'] . '\'
 OR ip LIKE \'%,' . $_SERVER['REMOTE_ADDR'] . '\'
@@ -161,10 +173,20 @@ AND expires>' . time() . '
 AND (starts<' . time() . ' OR starts IS NULL)') or error('Failed to check bans', __FILE__, __LINE__, $db->error());
 if ($db->num_rows($result) && !$ms_user['is_admin']) {
 	$ms_user['banned'] = true;
-	if ($url != '/banned' && $url != '/styles/default.css' && $url != '/help' && $url != '/logout' && $url != '/login') {
-		header('Location: /banned');
-		echo 'You are banned from Mod Share.';
-		die;
+	$_SESSION['banned'] = true;
+	$ban_info = $db->fetch_assoc($result);
+	if ($ban_info['type'] == 'login') {
+		if (strpos($url, '/login') === 0 || strpos($url, '/register') === 0) {
+			header('Location: /banned');
+			echo 'You are banned from Mod Share.';
+			die;
+		}
+	} else {
+		if ($url != '/banned' && strpos($url, '/styles') !== 0 && $url != '/help' && $url != '/logout' && $url != '/login' && $url != '/notifications' && $url != '/terms') {
+			header('Location: /banned');
+			echo 'You are banned from Mod Share.';
+			die;
+		}
 	}
 }
 if (isset($_SESSION['banned']) && !$ms_user['banned']) {
@@ -188,11 +210,13 @@ if ($ms_config['election_mandatory'] == 'yes' && $ms_config['election']) {
 
 //check if the page exists
 $ok = false;
+$permission_error = false;
 if (array_key_exists($url, $pages)) {
 	$ok = true;
 	$page_info = $pages[$url];
 	if ($page_info['permission'] > $ms_user['permission']) {
 		$ok = false;
+		$permission_error = true;
 	}
 } else {
 	foreach ($pageswithsubdirs as $key => $val) {
@@ -201,6 +225,10 @@ if (array_key_exists($url, $pages)) {
 			$page_info = $val;
 			break;
 		}
+	}
+	if ($page_info['permission'] > $ms_user['permission']) {
+		$ok = false;
+		$permission_error = true;
 	}
 }
 
@@ -254,8 +282,13 @@ if ($ok) {
 	echo $contents;
 } else {
 	// if not found, echo a 404 page
-	header('HTTP/1.1 404 Not found');
-	include SRV_ROOT . '/errorpages/404.php';
+	if ($permission_error) {
+		header('HTTP/1.1 403 Forbidden');
+		include SRV_ROOT . '/errorpages/permission_error.php';
+	} else {
+		header('HTTP/1.1 404 Not found');
+		include SRV_ROOT . '/errorpages/404.php';
+	}
 }
 
 $_SESSION['lastvisit'] = time();

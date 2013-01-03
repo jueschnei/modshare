@@ -10,8 +10,8 @@ if (isset($_POST['form_sent'])) {
 	$expire = strtotime($_POST['expire']);
 	$daysdiff = floor(($expire - time()) / 60 / 60 / 24);
 	//create ban
-	$db->query('INSERT INTO bans(user_id,ip,expires,message)
-	VALUES(' . intval($dirs[3]) . ',\'' . $db->escape($_POST['ip']) . '\',' . $expire . ',\'' . $db->escape($_POST['message']) . '\')') or error('Failed to add ban', __FILE__, __LINE__, $db->error());
+	$db->query('INSERT INTO bans(user_id,ip,expires,message,type)
+	VALUES(' . intval($dirs[3]) . ',\'' . $db->escape($_POST['ip']) . '\',' . $expire . ',\'' . $db->escape($_POST['message']) . '\',\'' . $db->escape($_POST['type']) . '\')') or error('Failed to add ban', __FILE__, __LINE__, $db->error());
 	$db->query('INSERT INTO adminhistory(to_user,from_user,time,action)
 	VALUES(' . intval($dirs[3]) . ',' . $ms_user['id'] . ',' . time() . ',\'' . $db->escape('Banned for ' . $daysdiff . ' days with the message "' . $_POST['message'] . '"') . '\')') or error('Failed to log admin action', __FILE__, __LINE__, $db->error());
 	
@@ -48,6 +48,10 @@ if ($db->num_rows($result)) {
 		<tr>
 			<td>Expires (e.g. <?php echo date('d M Y'); ?>)</td>
 			<td><input type="text" name="expire" value="<?php echo date('d M Y', time() + 60 * 60 * 24 * 4); ?>" /></td>
+		</tr>
+		<tr>
+			<td>Component</td>
+			<td><select name="type"><option value="full">Everything</option><option value="login">Login/registration</option></select></td>
 		</tr>
 	</table>
 	<input type="submit" name="form_sent" value="Add ban" />

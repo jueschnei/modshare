@@ -1,0 +1,7 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 3
+- // Language definitions used in admin-forums.php
+--- 3 -----
++ // Language definitions used in admin_forums.php

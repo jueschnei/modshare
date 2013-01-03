@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- Host: custsqlmoo29
--- Generation Time: Nov 12, 2012 at 08:21 PM
+-- Generation Time: Jan 02, 2013 at 10:47 PM
 -- Server version: 5.0.91
 -- PHP Version: 4.4.9
 -- 
@@ -23,7 +23,7 @@ CREATE TABLE `adminhistory` (
   `time` int(11) NOT NULL,
   `action` text collate latin1_general_ci NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=66 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=66 ;
+) ENGINE=MyISAM AUTO_INCREMENT=86 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=86 ;
 
 -- --------------------------------------------------------
 
@@ -36,10 +36,26 @@ CREATE TABLE `bans` (
   `user_id` int(11) default NULL,
   `ip` text collate latin1_general_ci NOT NULL,
   `expires` int(11) default NULL,
-  `message` varchar(500) collate latin1_general_ci NOT NULL,
+  `message` text collate latin1_general_ci NOT NULL,
   `starts` int(11) default NULL,
+  `type` enum('login','full') collate latin1_general_ci NOT NULL default 'full',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=46 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=46 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `casmsg`
+-- 
+
+CREATE TABLE `casmsg` (
+  `id` int(8) NOT NULL auto_increment,
+  `recipient` varchar(24) NOT NULL,
+  `title` varchar(50) NOT NULL,
+  `message` text NOT NULL,
+  `read_time` int(12) NOT NULL default '0',
+  UNIQUE KEY `id` (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -68,7 +84,7 @@ CREATE TABLE `comments` (
   `content` text collate latin1_general_ci NOT NULL,
   `ip_addr` varchar(20) collate latin1_general_ci NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=409 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=409 ;
+) ENGINE=MyISAM AUTO_INCREMENT=614 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=614 ;
 
 -- --------------------------------------------------------
 
@@ -117,7 +133,7 @@ CREATE TABLE `favorites` (
   `project_id` int(11) NOT NULL,
   `time` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=34 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=34 ;
+) ENGINE=MyISAM AUTO_INCREMENT=40 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=40 ;
 
 -- --------------------------------------------------------
 
@@ -134,7 +150,7 @@ CREATE TABLE `flags` (
   `time_flagged` int(11) NOT NULL,
   `zapped` int(11) default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=10 ;
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=16 ;
 
 -- --------------------------------------------------------
 
@@ -240,7 +256,7 @@ CREATE TABLE `flux_forums` (
   `disp_position` int(10) NOT NULL default '0',
   `cat_id` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8 AUTO_INCREMENT=20 ;
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8 AUTO_INCREMENT=21 ;
 
 -- --------------------------------------------------------
 
@@ -350,7 +366,7 @@ CREATE TABLE `flux_posts` (
   PRIMARY KEY  (`id`),
   KEY `fbb_posts_topic_id_idx` (`topic_id`),
   KEY `fbb_posts_multi_idx` (`poster_id`,`topic_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1509 DEFAULT CHARSET=utf8 AUTO_INCREMENT=1509 ;
+) ENGINE=MyISAM AUTO_INCREMENT=1852 DEFAULT CHARSET=utf8 AUTO_INCREMENT=1852 ;
 
 -- --------------------------------------------------------
 
@@ -383,7 +399,7 @@ CREATE TABLE `flux_reports` (
   `zapped_by` int(10) unsigned default NULL,
   PRIMARY KEY  (`id`),
   KEY `flux_reports_zapped_idx` (`zapped`)
-) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8 AUTO_INCREMENT=20 ;
+) ENGINE=MyISAM AUTO_INCREMENT=36 DEFAULT CHARSET=utf8 AUTO_INCREMENT=36 ;
 
 -- --------------------------------------------------------
 
@@ -424,7 +440,7 @@ CREATE TABLE `flux_search_words` (
   `word` varchar(20) character set utf8 collate utf8_bin NOT NULL default '',
   PRIMARY KEY  (`word`),
   KEY `flux_search_words_id_idx` (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4394 DEFAULT CHARSET=utf8 AUTO_INCREMENT=4394 ;
+) ENGINE=MyISAM AUTO_INCREMENT=5168 DEFAULT CHARSET=utf8 AUTO_INCREMENT=5168 ;
 
 -- --------------------------------------------------------
 
@@ -469,7 +485,7 @@ CREATE TABLE `flux_topics` (
   KEY `fbb_topics_moved_to_idx` (`moved_to`),
   KEY `fbb_topics_last_post_idx` (`last_post`),
   KEY `fbb_topics_first_post_id_idx` (`first_post_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=259 DEFAULT CHARSET=utf8 AUTO_INCREMENT=259 ;
+) ENGINE=MyISAM AUTO_INCREMENT=316 DEFAULT CHARSET=utf8 AUTO_INCREMENT=316 ;
 
 -- --------------------------------------------------------
 
@@ -578,7 +594,7 @@ CREATE TABLE `flux_users` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `fbb_users_username_idx` (`username`(25)),
   KEY `fbb_users_registered_idx` (`registered`)
-) ENGINE=MyISAM AUTO_INCREMENT=1340665203 DEFAULT CHARSET=utf8 AUTO_INCREMENT=1340665203 ;
+) ENGINE=MyISAM AUTO_INCREMENT=1340665210 DEFAULT CHARSET=utf8 AUTO_INCREMENT=1340665210 ;
 
 -- --------------------------------------------------------
 
@@ -592,7 +608,37 @@ CREATE TABLE `friends` (
   `friendee` int(11) NOT NULL,
   `time` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=28 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=28 ;
+) ENGINE=MyISAM AUTO_INCREMENT=53 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=53 ;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `galleries`
+-- 
+
+CREATE TABLE `galleries` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(200) NOT NULL,
+  `url` varchar(210) NOT NULL,
+  `contributors` text NOT NULL,
+  `creator` int(11) NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `url` (`url`)
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `gallery_projects`
+-- 
+
+CREATE TABLE `gallery_projects` (
+  `id` int(11) NOT NULL auto_increment,
+  `project_id` int(11) NOT NULL,
+  `gallery_id` int(11) NOT NULL,
+  `added` int(11) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
 
 -- --------------------------------------------------------
 
@@ -607,7 +653,7 @@ CREATE TABLE `imgsrv` (
   `uploaded` int(11) NOT NULL,
   `comments` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+) ENGINE=MyISAM AUTO_INCREMENT=34 DEFAULT CHARSET=latin1 AUTO_INCREMENT=34 ;
 
 -- --------------------------------------------------------
 
@@ -620,7 +666,22 @@ CREATE TABLE `loves` (
   `project` int(11) NOT NULL,
   `user` int(11) NOT NULL,
   UNIQUE KEY `id` (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=44 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=44 ;
+) ENGINE=MyISAM AUTO_INCREMENT=63 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=63 ;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `mods`
+-- 
+
+CREATE TABLE `mods` (
+  `id` varchar(12) NOT NULL,
+  `name` varchar(40) NOT NULL,
+  `extension` varchar(8) NOT NULL,
+  `url` varchar(250) NOT NULL,
+  `latestversion` varchar(40) NOT NULL,
+  UNIQUE KEY `id` (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -634,7 +695,7 @@ CREATE TABLE `notifications` (
   `type` tinyint(2) NOT NULL default '0',
   `message` text collate latin1_general_ci NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=157 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=157 ;
+) ENGINE=MyISAM AUTO_INCREMENT=353 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=353 ;
 
 -- --------------------------------------------------------
 
@@ -647,7 +708,7 @@ CREATE TABLE `notificationstoadmin` (
   `text` text NOT NULL,
   `zapped` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
+) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=latin1 AUTO_INCREMENT=19 ;
 
 -- --------------------------------------------------------
 
@@ -662,7 +723,7 @@ CREATE TABLE `project_views` (
   `ip` varchar(50) default NULL,
   `time` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1392 DEFAULT CHARSET=latin1 AUTO_INCREMENT=1392 ;
+) ENGINE=MyISAM AUTO_INCREMENT=4146 DEFAULT CHARSET=latin1 AUTO_INCREMENT=4146 ;
 
 -- --------------------------------------------------------
 
@@ -677,15 +738,39 @@ CREATE TABLE `projects` (
   `description` text collate latin1_general_ci NOT NULL,
   `license` enum('pd','ms','cc','arr') collate latin1_general_ci NOT NULL,
   `uploaded_by` int(11) NOT NULL,
-  `thumbnail` longblob NOT NULL,
   `modification` varchar(10) collate latin1_general_ci NOT NULL,
-  `status` enum('normal','blocked','deleted') collate latin1_general_ci NOT NULL default 'normal',
+  `status` enum('normal','blocked','deleted','toomanyreports') collate latin1_general_ci NOT NULL default 'normal',
   `time` int(11) NOT NULL,
   `ip_addr` varchar(20) collate latin1_general_ci NOT NULL,
   `featured` int(11) default NULL,
   `downloads` int(10) NOT NULL default '0',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=127 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=127 ;
+) ENGINE=MyISAM AUTO_INCREMENT=170 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=170 ;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `search_index`
+-- 
+
+CREATE TABLE `search_index` (
+  `id` int(11) NOT NULL auto_increment,
+  `project` int(11) NOT NULL,
+  `word` varchar(150) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=46691 DEFAULT CHARSET=latin1 AUTO_INCREMENT=46691 ;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `search_index_mistakes`
+-- 
+
+CREATE TABLE `search_index_mistakes` (
+  `word` varchar(150) NOT NULL,
+  `replacements` text NOT NULL,
+  PRIMARY KEY  (`word`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -702,7 +787,7 @@ CREATE TABLE `uploadqueue` (
   `license` varchar(3) NOT NULL,
   `title` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=32 DEFAULT CHARSET=latin1 AUTO_INCREMENT=32 ;
+) ENGINE=MyISAM AUTO_INCREMENT=43 DEFAULT CHARSET=latin1 AUTO_INCREMENT=43 ;
 
 -- --------------------------------------------------------
 
@@ -718,10 +803,11 @@ CREATE TABLE `users` (
   `registered` int(11) NOT NULL,
   `registration_ip` varchar(50) collate latin1_general_ci NOT NULL,
   `permission` int(11) NOT NULL default '1',
-  `avatar` longblob NOT NULL,
   `timezone` int(11) NOT NULL default '0',
   `style_col` varchar(3) collate latin1_general_ci NOT NULL default '000',
   `style_logo` enum('default','black','white','red','green','blue','yellow','purple') collate latin1_general_ci NOT NULL default 'default' COMMENT 'header logo',
   `imgsrv` tinyint(1) NOT NULL default '0',
+  `featured_project` int(10) NOT NULL,
+  `last_comment` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=143 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=143 ;
+) ENGINE=MyISAM AUTO_INCREMENT=163 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=163 ;

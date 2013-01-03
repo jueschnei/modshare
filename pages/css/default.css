@@ -1,7 +1,7 @@
 <?php
 $content_type = 'text/css';
 
-$style = $ms_user['style_col'];
+$style = '44A';
 $r = hexdec($style{0});
 $g = hexdec($style{1});
 $b = hexdec($style{2});
@@ -21,6 +21,9 @@ body  {
 	padding: 0;
 	text-align: center;
 	color: #000000;
+	background-image:url(/img/snow.jpg);
+	background-size:100% 1200px;
+	background-repeat:repeat-y;
 }
 #container {
 	border-bottom-left-radius: 4px;
@@ -167,7 +170,35 @@ textarea {
 	-webkit-transition: background-color .5s linear;
 }
 
+.alphaover {
+	opacity: 0.4;
+}
+.alphaover:hover {
+	opacity: 1;
+}
+
 .editable:hover {
-	background-color:#FF4;
+	background-color:#FF9;
 	-webkit-transition: background-color .5s linear;
+}
+
+input.searchBox {
+	opacity: .8;
+	border-radius:3px;
+	color:#AAA;
+}
+
+.userpageheading {
+	/*font-variant: small-caps;*/
+	border-bottom: solid 1px #000;
+}
+
+.roundedbevel {
+	border-radius: 6px;
+	border: solid 1px #CCC;
+	background-color: #DDD;
+	box-shadow: 1px 2px 10px 3px #DDD;
+	margin-bottom: 8px;
+	padding-left: 4px;
+	padding-right: 4px;
 }
